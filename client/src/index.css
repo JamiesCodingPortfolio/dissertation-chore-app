@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+
+    background-image: linear-gradient(
+        to bottom,
+        #2DA0B5,
+        #DAEEF2
+    );
+}
