@@ -6,11 +6,20 @@ function App() {
 
   return (
     <>
-      <div className='container w-800px h-800px bg-green-200'>
-        <div className="app-logo">
-          <a href="https://react.dev" target="_blank">
-            <img src={reactLogo} className="logo" alt="Chorepad Logo" />
-          </a>
+      <div
+        className="grid bg-white rounded-[30px] justify-center"
+        style={{
+          width: "clamp(350px, calc(0.2946 * 100vw + 234.34px), 800px)",
+          height: "clamp(600px, calc(1.7544 * 100vh - 894.3px), 1000px)"
+        }}
+      >
+        <div className='logo-container'
+        >
+          <div className="app-logo">
+            <a href="/" target="_blank">
+              <img src={reactLogo} className="logo" alt="Chorepad Logo" />
+            </a>
+          </div>
         </div>
       </div>
     </>
