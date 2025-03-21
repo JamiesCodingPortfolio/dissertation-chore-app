@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import reactLogo from './assets/App Logo.svg'
+import appLogo from './assets/App Logo.svg'
 import './App.css'
 
 function App() {
@@ -17,8 +16,13 @@ function App() {
         >
           <div className="app-logo">
             <a href="/" target="_blank">
-              <img src={reactLogo} className="logo" alt="Chorepad Logo" />
+              <img src={appLogo} className="logo" alt="Chorepad Logo" />
             </a>
+          </div>
+          <div className="app-text">
+            <h1>
+              Chorepad
+            </h1>
           </div>
         </div>
       </div>

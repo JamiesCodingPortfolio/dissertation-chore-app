@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Encode+Sans+Semi+Expanded:wght@100;200;300;400;500;600;700;800;900&family=Encode+Sans:wdth,wght@112.5,900&display=swap');
 @import "tailwindcss";
 
 .app-logo {
@@ -16,8 +17,17 @@
   }
 
 .logo-container {
-  display: grid;
+  display: flex;
+  align-items: center;
   justify-content: center;
   width: 585px;
   height: 120px;
+  /*translate:10% 10%;*/
+}
+
+.app-text{
+  h1{
+    font-size: 96;
+    font-family: "Encode Sans", sans-serif;
+  }
 }
