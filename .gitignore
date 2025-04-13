@@ -26,3 +26,6 @@ dist-ssr
 #SSL Certificates
 certificate.crt
 private.key
+
+#Env files
+.env
