@@ -23,6 +23,6 @@ const httpsServer = https.createServer(
   app
 );
 
-httpsServer.listen(8443, () => {
+httpsServer.listen(8443, '0.0.0.0', () => {
   console.log("HTTPS Server started on port 8443");
 });
