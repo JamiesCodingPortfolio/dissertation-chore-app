@@ -1,13 +1,29 @@
 import { useEffect } from 'react'
 import appLogo from './assets/App Logo.svg'
 import './App.css'
-import axios from 'axios'
 
 function App() {
 
   const fetchAPI = async () => {
-    const response = await axios.get("http://localhost:8080/api");
-    console.log(response.data.bruhs);
+    try {
+      const response = await fetch("0.0.0.0/api", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        }
+      });
+      
+      // Check if the response is successful
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("Connection Established");
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
   useEffect(() => {

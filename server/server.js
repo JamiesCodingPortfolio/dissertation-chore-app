@@ -14,6 +14,8 @@ const certificate = fs.readFileSync(join(__dirname, '../certificate.crt'), 'utf-
 
 const app = express();
 
+app.use(express.json());
+
 app.get("/api", (req, res) => {
   res.json({ bruhs: ["bruh", "bruhs"] });
 });
@@ -23,6 +25,6 @@ const httpsServer = https.createServer(
   app
 );
 
-httpsServer.listen(8443, '0.0.0.0', () => {
-  console.log("HTTPS Server started on port 8443");
+httpsServer.listen(2053, '0.0.0.0', () => {
+  console.log("HTTPS Server started on port 2053");
 });
