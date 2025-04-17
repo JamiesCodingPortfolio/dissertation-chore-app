@@ -6,7 +6,7 @@ function App() {
 
   const fetchAPI = async () => {
     try {
-      const response = await fetch("0.0.0.0/api", {
+      const response = await fetch("htttps://j-brown.uk/api", {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
