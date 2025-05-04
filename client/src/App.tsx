@@ -6,7 +6,7 @@ function App() {
 
   const fetchAPI = async () => {
     try {
-      const response = await fetch("htttps://j-brown.uk/api", {
+      const response = await fetch("https://j-brown.uk/api", {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -33,10 +33,10 @@ function App() {
   return (
     <>
       <div
-        className="grid bg-white rounded-[30px] justify-center"
+        className="container grid bg-white rounded-[30px] justify-center"
         style={{
-          width: "clamp(350px, calc(0.2946 * 100vw + 234.34px), 800px)",
-          height: "clamp(600px, calc(1.7544 * 100vh - 894.3px), 1000px)"
+          width: `clamp(calc(100vw - 43px))`,
+          height: ``,
         }}
       >
         <div className='logo-container'
