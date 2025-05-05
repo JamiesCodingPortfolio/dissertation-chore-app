@@ -24,10 +24,11 @@
 .logo-container {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   width: 585px;
   height: 120px;
   /*translate:10% 10%;*/
+  margin-top: calc(100%-(100%-120px));
   
 }
 
@@ -35,11 +36,15 @@
   h1{
     font-size: 84px;
     font-family: "Encode Sans", sans-serif;
+    background: linear-gradient(
+    to right,
+    #88C9D5,
+    #E2848C
+  );
+    -webkit-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
   }
-}
-.logo-container{
-  justify-content: space-between;
-  height: (100% - 120px)
 }
 
 @media (min-width: 843px) and (max-width: 1920px) {
