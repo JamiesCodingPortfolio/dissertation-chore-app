@@ -39,8 +39,7 @@ function App() {
           height: ``,
         }}
       >
-        <div className='logo-container'
-        >
+        <div className='logo-container'>
           <div className="app-logo">
             <a href="/" target="_blank">
               <img src={appLogo} className="logo" alt="Chorepad Logo" />
