@@ -4,9 +4,15 @@ import './App.css'
 
 function App() {
 
+  
   const fetchAPI = async () => {
     try {
-      const response = await fetch("https://j-brown.uk/api", {
+
+      const domain = import.meta.env.VITE_DOMAIN_NAME
+      ? (import.meta.env.VITE_DOMAIN_NAME as string)
+      : 'http://localhost:8080'
+
+      const response = await fetch(domain, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
