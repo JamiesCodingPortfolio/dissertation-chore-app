@@ -1,9 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Encode+Sans+Semi+Expanded:wght@100;200;300;400;500;600;700;800;900&family=Encode+Sans:wdth,wght@112.5,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Encode+Sans:wdth,wght@100,400;100,600;100,900&family=Encode+Sans+Semi+Expanded:wght@400;600;900&display=swap');
 @import "tailwindcss";
 
 .body{
   height:100vh;
-  width: 100wv;
+  width: 100vw;
+}
+
+.container{
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 585px;
+  height: 120px;
+  margin-top: 7%;
+  
 }
 
 .app-logo {
@@ -21,21 +39,11 @@
     width: 105px;
   }
 
-.logo-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 585px;
-  height: 120px;
-  /*translate:10% 10%;*/
-  margin-top: calc(100%-(100%-120px));
-  
-}
-
 .app-text{
   h1{
     font-size: 84px;
-    font-family: "Encode Sans", sans-serif;
+    font-family: "Encode Sans Semi Expanded", sans-serif;
+    font-weight: 900;
     background: linear-gradient(
     to right,
     #88C9D5,
@@ -47,9 +55,91 @@
   }
 }
 
+.welcome-text{
+  h1{
+    font-size: 64px;
+    font-family: "Encode Sans", sans-serif;
+    color: #494848;
+    font-weight: 900;
+  }
+}
+
+.welcome-desc{
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  h2{
+    font-size: 36px;
+    font-family: "Encode Sans", sans-serif;
+    color: #494848;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+}
+
+.buttons-container{
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.login-button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 700px;
+  height: 80px;
+  background-color: #E2848C;
+  cursor: pointer;
+  h1{
+    font-family: "Encode Sans", sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    color: white;
+  }
+}
+
+.signup-button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 700px;
+  height: 80px;
+  background-color: white;
+  border: 2px solid #E2848C;
+  border-radius: 25px;
+  cursor: pointer;
+  h1{
+    font-family: "Encode Sans", sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    color: #E2848C;
+  }
+}
+
+
+
+.google-login{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 5%;
+
+  h2{
+    font-family: "Encode Sans", sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: #767676;
+  }
+  img{
+    height:110px;
+    width: 110px;
+  }
+}
+
 @media (min-width: 843px) and (max-width: 1920px) {
   .container {
     width: 800px;
-    height: calc(100vh - 80px);
+    height: 96vh;
   }
 }

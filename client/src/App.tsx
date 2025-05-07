@@ -1,28 +1,36 @@
-import { Fragment, useEffect } from 'react'
+import { useEffect } from 'react'
 import appLogo from './assets/App Logo.svg'
+import googleLogo from './assets/Google Logo.svg'
 import './App.css'
 import './transitions.css'
-import Login from './Login';
-import Signup from './Signup';
+import Login from './Login'
+import Signup from './Signup'
 import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
-
-
+import { useRef } from 'react';
 
 function AnimatedRoutes () {
   const location = useLocation()
+  const nodeRef = useRef(null);
 
   return (
-    <TransitionGroup component={Fragment}>                                
+    <TransitionGroup component={null}>                                
       <CSSTransition
-        key={location.key}                                         
+        key={location.key}
+        nodeRef={nodeRef}
         classNames="fade"
-        timeout={300}>
-        <Routes location={location}>                                  
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-        </Routes>
+        timeout={300}
+        unmountOnExit
+      >
+        {(state) => (
+          <div className="transition-wrapper">
+            <Routes location={location}>                                  
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+            </Routes>
+          </div>
+        )}
       </CSSTransition>
     </TransitionGroup>
   )
@@ -35,11 +43,12 @@ function Home() {
   return (
     <>
       <div
-        className="container grid bg-white rounded-[30px] justify-center"
-        style={{
-          width: 'clamp(300px, 100vw - 43px, 800px)',
-          height: ``,
-        }}>
+      className="container grid bg-white rounded-[30px]"
+      style={{
+        width: 'clamp(300px, 100vw - 43px, 800px)',
+        height: ``,
+      }}>
+
         <div className='logo-container'>
           <div className="app-logo">
             <Link to="/">
@@ -52,8 +61,49 @@ function Home() {
             </h1>
           </div>
         </div>
-          <Link to="/login"><button>Login</button></Link>
-          <Link to="/signup"><button>Signup</button></Link>
+
+        <div className='welcome-text'>
+          <h1>
+            Good Evening
+          </h1>
+        </div>
+
+        <div className='welcome-desc'>
+          <h2>
+            Welcome to Chorepad, where you<br />can manage chores for you<br />and your household
+          </h2>
+        </div>
+        
+        <div className='buttons-container'>
+          <div className='login-button rounded-[25px]'>
+            <Link to="/login">
+              <button className='login-text'>
+                <h1>
+                  Login
+                </h1>
+              </button>
+            </Link>
+          </div>
+          <div className='signup-button'>
+            <Link to="/signup">
+              <button className='singup-text'>
+                <h1>
+                  Sign Up
+                </h1>
+              </button>
+            </Link>
+          </div>
+        </div>
+        <div className='google-login'>
+          <div>
+            <h2>
+              Sign in with
+            </h2>
+          </div>
+          <div>
+            <img src={googleLogo} className="google-logo" alt="Google Logo" />
+          </div>
+        </div>
       </div>
     </>
   )
