@@ -96,6 +96,7 @@
     font-weight: 600;
     font-size: 32px;
     color: white;
+    cursor: pointer;
   }
 }
 
@@ -114,6 +115,7 @@
     font-weight: 600;
     font-size: 32px;
     color: #E2848C;
+    cursor: pointer;
   }
 }
 
