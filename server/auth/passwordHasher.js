@@ -1,0 +1,14 @@
+import crypto from 'crypto';
+
+function hashPassword(password, salt){
+    return new Promise((resolve, reject) => {
+        crypto.scrypt(password.normalize(), salt, 64, (error, hash) => {
+            if (error) reject(error)
+
+                resolve(hash.toString("hex").normalize());
+        });
+    });
+    
+};
+
+export default hashPassword;
