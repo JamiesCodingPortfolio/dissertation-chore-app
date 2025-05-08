@@ -75,24 +75,20 @@ function Home() {
         </div>
         
         <div className='buttons-container'>
-          <div className='login-button rounded-[25px]'>
-            <Link to="/login">
-              <button className='login-text'>
-                <h1>
-                  Login
-                </h1>
-              </button>
-            </Link>
-          </div>
-          <div className='signup-button'>
-            <Link to="/signup">
-              <button className='singup-text'>
-                <h1>
-                  Sign Up
-                </h1>
-              </button>
-            </Link>
-          </div>
+          <Link to="/login">
+            <div className='login-button rounded-[25px]'>
+              <h1>
+                Login
+              </h1>
+            </div>
+          </Link>
+          <Link to="/signup">
+            <div className='signup-button'>
+              <h1>
+                Sign Up
+              </h1>
+            </div>
+          </Link>
         </div>
         <div className='google-login'>
           <div>

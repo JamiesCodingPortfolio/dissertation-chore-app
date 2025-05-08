@@ -5,11 +5,12 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
+import connectDB from './database/database-connections.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 dotenv.config({ path: join(__dirname, '../.env') });
-
 
 const app = express();
 
@@ -22,6 +23,8 @@ app.get("/api", (req, res) => {
 const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true'
 const HTTP_PORT = process.env.HTTP_PORT_NUMBER
 const HTTPS_PORT = process.env.HTTPS_PORT_NUMBER
+
+connectDB();
 
 if (HTTPS_ENABLED){
 
