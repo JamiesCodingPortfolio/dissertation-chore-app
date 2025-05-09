@@ -48,5 +48,22 @@ const checkEmailExists = async (email) => {
     }
 };
 
+const addNewUser = async (name, email, hashedPassword, salt) => {
+    try {
+
+        if (typeof name !== 'string'){
+            throw new Error('Invalid name input')
+        }
+        if (typeof email !== 'string' || email.trim() === '') {
+            throw new Error('Invalid email input');
+        }
+
+        const lowercaseEmail = email.toLowerCase().trim();
+
+    } catch (error) {
+        
+    }
+}
+
 export { connectDB, checkEmailExists };
 export default connectDB;

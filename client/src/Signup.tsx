@@ -38,7 +38,7 @@ const Signup = () => {
       setIsError(true);
     }
   };
-  
+
   return (
     <div
       className="signup-container grid bg-white rounded-[30px]"
@@ -67,7 +67,7 @@ const Signup = () => {
           className="border rounded-lg p-2 text-center"
           placeholder="Enter your name"
           value={name}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           required
         />
         <label htmlFor="email" className="text-gray-600">Email</label>
