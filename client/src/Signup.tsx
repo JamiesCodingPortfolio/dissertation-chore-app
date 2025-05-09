@@ -64,18 +64,18 @@ const Signup = () => {
           type="name"
           id="name"
           name="name"
-          className="border rounded-lg p-2"
+          className="border rounded-lg p-2 text-center"
           placeholder="Enter your name"
           value={name}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <label htmlFor="email" className="text-gray-600">Email:</label>
+        <label htmlFor="email" className="text-gray-600">Email</label>
         <input
           type="email"
           id="email"
           name="email"
-          className="border rounded-lg p-2"
+          className="border rounded-lg p-2 text-center"
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -86,7 +86,7 @@ const Signup = () => {
           type="password"
           id="password"
           name="password"
-          className="border rounded-lg p-2"
+          className="border rounded-lg p-2 text-center"
           placeholder="Enter a password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
