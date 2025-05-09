@@ -91,6 +91,7 @@
   height: 80px;
   background-color: #E2848C;
   cursor: pointer;
+  transform-origin: center;
   h1{
     font-family: "Encode Sans", sans-serif;
     font-weight: 600;
@@ -104,10 +105,9 @@
   transition: ease-in 100ms;
   border: 2px solid #E2848C;
   background-color: #81C6D2;
-  h1{
-    color: white
-  }
+  transform: scale(1.05);
 }
+
 
 .signup-button{
   display: flex;
@@ -119,6 +119,7 @@
   border: 2px solid #E2848C;
   border-radius: 25px;
   cursor: pointer;
+  transform-origin: center;
   h1{
     font-family: "Encode Sans", sans-serif;
     font-weight: 600;
@@ -131,6 +132,7 @@
 .signup-button:hover{
   transition: ease-in 100ms;
   background-color: #81C6D2;
+  transform: scale(1.05);
   h1{
     color: white
   }
