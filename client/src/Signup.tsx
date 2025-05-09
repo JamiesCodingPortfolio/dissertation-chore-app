@@ -41,9 +41,9 @@ const Signup = () => {
   
   return (
     <div
-      className="container grid bg-white rounded-[30px] justify-center"
+      className="signup-container grid bg-white rounded-[30px]"
       style={{
-        width: `clamp(calc(100vw - 43px))`,
+        width: 'clamp(300px, 100vw - 43px, 800px)',
         height: ``,
       }}>
       <div className='logo-container'>
