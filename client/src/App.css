@@ -162,3 +162,10 @@
     height: 96vh;
   }
 }
+
+@media (min-width:1920px){
+  .container{
+    width: 42%;
+    height: 96vh;
+  }
+}
