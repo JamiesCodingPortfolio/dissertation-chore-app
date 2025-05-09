@@ -1,10 +1,13 @@
 import { useState, FormEvent } from 'react'
 import appLogo from './assets/App Logo.svg'
 import {Link} from 'react-router-dom'
+import './Signup.css'
 import './App.css'
 const Signup = () => {
   
   const [email, setEmail] = useState<string>('');
+  const [name, setName] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [isError, setIsError] = useState<boolean>(false);
 
@@ -17,7 +20,7 @@ const Signup = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
@@ -55,7 +58,18 @@ const Signup = () => {
           </h1>
         </div>
       </div>
-      <form className="signup-form grid gap-y-2 px-8" onSubmit={handleSubmit}>
+      <form className="signup-form gap-y-2 px-8" onSubmit={handleSubmit}>
+        <label htmlFor='name' className='text-gray-600'>Name</label>
+        <input
+          type="name"
+          id="name"
+          name="name"
+          className="border rounded-lg p-2"
+          placeholder="Enter your name"
+          value={name}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
         <label htmlFor="email" className="text-gray-600">Email:</label>
         <input
           type="email"
@@ -65,6 +79,17 @@ const Signup = () => {
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <label htmlFor='password' className='text-gray-600'>Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          className="border rounded-lg p-2"
+          placeholder="Enter a password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
         <button 
