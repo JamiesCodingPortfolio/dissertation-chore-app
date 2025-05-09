@@ -1,13 +1,13 @@
-import { useEffect } from 'react'
 import appLogo from './assets/App Logo.svg'
-import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import './App.css'
+import './Login.css'
 const Login = () => {
   return (
     <div
-      className="container grid bg-white rounded-[30px] justify-center"
+      className="login-container grid bg-white rounded-[30px] justify-center"
       style={{
-        width: `clamp(calc(100vw - 43px))`,
+        width: 'clamp(300px, 100vw - 43px, 800px)',
         height: ``,
       }}>
       <div className='logo-container'>
