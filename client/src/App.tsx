@@ -43,11 +43,7 @@ function Home() {
   return (
     <>
       <div
-      className="container grid bg-white rounded-[30px]"
-      style={{
-        width: 'clamp(300px, 100vw - 43px, 800px)',
-        height: ``,
-      }}>
+      className="container grid bg-white rounded-[30px]">
 
         <div className='logo-container'>
           <div className="app-logo">

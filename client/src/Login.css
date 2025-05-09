@@ -14,11 +14,16 @@
     text-align: center;
 }
 
-
-
 @media (min-width: 843px) and (max-width: 1920px) {
-  .login-container {
-    width: 800px;
-    height: 96vh;
-  }
+    .login-container {
+        width: 800px;
+        height: 96vh;
+    }
+}
+
+@media (min-width:1921px) {
+    .login-container{
+        width: 42vw;
+        height: 96vh;
+    }
 }

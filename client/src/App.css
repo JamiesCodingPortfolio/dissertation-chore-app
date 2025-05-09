@@ -21,7 +21,6 @@
   width: 585px;
   height: 120px;
   margin-top: 7%;
-  
 }
 
 .app-logo {
@@ -165,7 +164,7 @@
 
 @media (min-width:1920px){
   .container{
-    width: 42%;
+    width: 42vw;
     height: 96vh;
   }
 }

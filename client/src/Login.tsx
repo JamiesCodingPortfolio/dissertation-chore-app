@@ -5,11 +5,7 @@ import './Login.css'
 const Login = () => {
   return (
     <div
-      className="login-container grid bg-white rounded-[30px] justify-center"
-      style={{
-        width: 'clamp(300px, 100vw - 43px, 800px)',
-        height: ``,
-      }}>
+      className="login-container grid bg-white rounded-[30px]">
       <div className='logo-container'>
         <div className="app-logo">
           <Link to="/">

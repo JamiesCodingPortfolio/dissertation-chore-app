@@ -14,11 +14,16 @@
     text-align: center;
 }
 
-
-
 @media (min-width: 843px) and (max-width: 1920px) {
   .signup-container {
     width: 800px;
-    height: 96vh;
+    height: 96dvh;
+  }
+}
+
+@media (min-width:1921px) {
+  .signup-container{
+    width: 42vw;
+    height: 96dvh;
   }
 }

@@ -41,11 +41,7 @@ const Signup = () => {
 
   return (
     <div
-      className="signup-container grid bg-white rounded-[30px]"
-      style={{
-        width: 'clamp(300px, 100vw - 43px, 800px)',
-        height: ``,
-      }}>
+      className="signup-container grid bg-white rounded-[30px]">
       <div className='logo-container'>
         <div className="app-logo">
           <Link to="/">
