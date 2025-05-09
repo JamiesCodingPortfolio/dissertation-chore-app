@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import cors from 'cors';
 
-import { connectDB, checkEmailExists } from './database/database-connections.js';
+import { addNewUser, connectDB, checkEmailExists, createNewSession } from './database/database-connections.js';
 import { hashPassword, generateSalt } from './auth/passwordHasher.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -56,11 +56,15 @@ app.post('/signup', async (req, res) => {
     
     console.log('Recieved email:', email);
 
-    const emailExists = await checkEmailExists(email);
-
     const generatedSalt = await generateSalt();
     const hashedPassword = await hashPassword(password, generatedSalt);
     console.log(hashedPassword);
+
+    const newUserId = await addNewUser(name, email, hashedPassword, generatedSalt);
+
+    console.log(newUserId)
+
+    const newToken = await createNewSession(newUserId);
 
     if (emailExists === true) {
       setTimeout(() => {
@@ -74,7 +78,7 @@ app.post('/signup', async (req, res) => {
     }
 
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: "Could not create account" });
   }
   
 })

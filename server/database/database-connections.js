@@ -2,8 +2,9 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import crypto from 'crypto';
 
-import hashToken from './hashToken'
+import { hashTokens } from '../auth/hashToken.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -60,10 +61,48 @@ const addNewUser = async (name, email, hashedPassword, salt) => {
             throw new Error('Invalid email input');
         }
 
+        if (typeof hashedPassword !== 'string' || hashedPassword === '') {
+            throw new Error('Invalid password hash');
+        }
+
+        if (typeof salt !== 'string' || salt === '') {
+            throw new Error('Invalid salt value');
+        }
+
         const lowercaseEmail = email.toLowerCase().trim();
 
-    } catch (error) {
+        const emailExists = await checkEmailExists(lowercaseEmail);
+        if (emailExists) {
+            throw new Error('Email already registered');
+        }
+
+        if (emailExists === null) {
+            throw new Error('Could not verify email availability');
+        }
+
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const users = mongoose.connection.db.collection('Users');
         
+        const result = await users.insertOne({
+            username: name.trim(),
+            email: lowercaseEmail,
+            hashedPassword,
+            salt
+        });
+
+        if (!result.acknowledged) {
+            throw new Error('Failed to create user');
+        }
+
+        console.log('User added with ID:', result.insertedId);
+        return result.insertedId;
+
+    } catch (error) {
+        console.error('Error adding new user:', error);
+        throw error;
     }
 }
 
@@ -75,17 +114,24 @@ const createNewSession = async (userId) => {
 
         const sessions = mongoose.connection.db.collection('Sessions');
         const token = crypto.randomBytes(32).toString('hex');
-        const tokenHash = hashToken(token);
+        const tokenHash = hashTokens(token);
 
-        await sessions.insertOne({
-            userId: new mongoose.Types.ObjectId.createFromHexString(userId),
+        const userIdSes = new mongoose.Types.ObjectId(userId)
+
+        const result = await sessions.insertOne({
+            userId: userIdSes,
             tokenHash,
             createdOn: new Date()
         });
 
+        console.log("Session created for user:", userIdSes);
+        console.log("Session document ID:", result.insertedId);
+        return token;
+
     } catch (error) {
-        
+        console.error('Session creation error:', error);
+        throw new Error('Failed to create session');
     }
 }
 
-export { connectDB, checkEmailExists };
+export { createNewSession, addNewUser, connectDB, checkEmailExists };
