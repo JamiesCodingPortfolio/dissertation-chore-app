@@ -21,20 +21,32 @@ const connectDB = async () => {
     }
 };
 
-const checkUsernameInUse = async (username) => {
+const checkEmailExists = async (email) => {
     try {
-        const users = mongoose.connection.db.collection('users');
+        if (typeof email !== 'string' || email.trim() === '') {
+            throw new Error('Invalid email input');
+        }
+
+        const lowercaseEmail = email.toLowerCase().trim();
+        
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const users = mongoose.connection.db.collection('Users');
         const existingUser = await users.findOne(
-            { username: { $regex: `^${username}$`, $options: 'i' } },
+            { email: lowercaseEmail },
             { projection: { _id: 1 } }
         );
+
+        console.log(existingUser)
         return !!existingUser;
     } 
     catch (error) {
-        console.log('Username error:', error);
-        throw new Error('Error cehcking username availability');
+        console.error('Email check error:', error);
+        throw new Error('Error checking email availability');
     }
 };
 
-export { connectDB, checkUsernameInUse };
+export { connectDB, checkEmailExists };
 export default connectDB;

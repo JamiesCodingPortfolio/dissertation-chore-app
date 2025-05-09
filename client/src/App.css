@@ -100,6 +100,15 @@
   }
 }
 
+.login-button:hover{
+  transition: ease-in 100ms;
+  border: 2px solid #E2848C;
+  background-color: #81C6D2;
+  h1{
+    color: white
+  }
+}
+
 .signup-button{
   display: flex;
   align-items: center;
@@ -119,7 +128,13 @@
   }
 }
 
-
+.signup-button:hover{
+  transition: ease-in 100ms;
+  background-color: #81C6D2;
+  h1{
+    color: white
+  }
+}
 
 .google-login{
   display: flex;
