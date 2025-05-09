@@ -155,6 +155,13 @@
   }
 }
 
+@media (max-width: 842px){
+  .container{
+    width: 96vw;
+    height: 96vh;
+  }
+}
+
 @media (min-width: 843px) and (max-width: 1920px) {
   .container {
     width: 800px;

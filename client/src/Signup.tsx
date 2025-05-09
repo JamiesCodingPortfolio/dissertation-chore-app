@@ -20,7 +20,11 @@ const Signup = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          email, 
+          password,
+          name 
+        }),
       });
 
       const data = await response.json();
@@ -32,6 +36,8 @@ const Signup = () => {
       setMessage(data.message);
       setIsError(false);
       setEmail('');
+      setPassword('');
+      setName('');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An unknown error occurred';
       setMessage(message);
@@ -57,7 +63,7 @@ const Signup = () => {
       <form className="signup-form gap-y-2 px-8" onSubmit={handleSubmit}>
         <label htmlFor='name' className='text-gray-600'>Name</label>
         <input
-          type="name"
+          type="text"
           id="name"
           name="name"
           className="border rounded-lg p-2 text-center"

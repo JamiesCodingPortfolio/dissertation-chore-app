@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
+import hashToken from './hashToken'
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -65,5 +67,25 @@ const addNewUser = async (name, email, hashedPassword, salt) => {
     }
 }
 
+const createNewSession = async (userId) => {
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const sessions = mongoose.connection.db.collection('Sessions');
+        const token = crypto.randomBytes(32).toString('hex');
+        const tokenHash = hashToken(token);
+
+        await sessions.insertOne({
+            userId: new mongoose.Types.ObjectId.createFromHexString(userId),
+            tokenHash,
+            createdOn: new Date()
+        });
+
+    } catch (error) {
+        
+    }
+}
+
 export { connectDB, checkEmailExists };
-export default connectDB;

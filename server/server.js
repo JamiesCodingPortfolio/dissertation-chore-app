@@ -6,8 +6,8 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import cors from 'cors';
 
-import connectDB, { checkEmailExists } from './database/database-connections.js';
-import hashPassword from './auth/passwordHasher.js';
+import { connectDB, checkEmailExists } from './database/database-connections.js';
+import { hashPassword, generateSalt } from './auth/passwordHasher.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -52,18 +52,19 @@ else{
 
 app.post('/signup', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
     
     console.log('Recieved email:', email);
 
     const emailExists = await checkEmailExists(email);
 
-    const hashedPassword = await hashPassword(password, generateSalt());
+    const generatedSalt = await generateSalt();
+    const hashedPassword = await hashPassword(password, generatedSalt);
     console.log(hashedPassword);
-    
+
     if (emailExists === true) {
       setTimeout(() => {
-        res.status(406).json({ message: 'Email already in use' });
+        res.status(406).json({ message: 'This email is already registered to an account.' });
       }, 1000);
     }
     else{
@@ -72,11 +73,8 @@ app.post('/signup', async (req, res) => {
       }, 1000);
     }
 
-    
-
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-
   
 })
