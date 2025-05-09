@@ -7,6 +7,7 @@ import { dirname, join } from 'path';
 import cors from 'cors';
 
 import connectDB, { checkEmailExists } from './database/database-connections.js';
+import hashPassword from './auth/passwordHasher.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -51,11 +52,14 @@ else{
 
 app.post('/signup', async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, password } = req.body;
     
     console.log('Recieved email:', email);
 
     const emailExists = await checkEmailExists(email);
+
+    const hashedPassword = await hashPassword(password, generateSalt());
+    console.log(hashedPassword);
     
     if (emailExists === true) {
       setTimeout(() => {
@@ -68,7 +72,11 @@ app.post('/signup', async (req, res) => {
       }, 1000);
     }
 
+    
+
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
+
+  
 })
