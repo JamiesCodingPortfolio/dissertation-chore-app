@@ -117,7 +117,7 @@ const createNewSession = async (userId) => {
         const token = crypto.randomBytes(32).toString('hex');
         const tokenHash = hashTokens(token);
 
-        const userIdSes = new mongoose.Types.ObjectId(userId)
+        const userIdSes = new mongoose.Types.ObjectId(`${userId}`) // Removes depreciation warning
 
         const result = await sessions.insertOne({
             userId: userIdSes,
