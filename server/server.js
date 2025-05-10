@@ -5,6 +5,7 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import cors from 'cors';
+//import cookieParser from 'cookie-parser'
 
 import { addNewUser, connectDB, checkEmailExists, createNewSession } from './database/database-connections.js';
 import { hashPassword, generateSalt } from './auth/passwordHasher.js';
@@ -18,8 +19,10 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3000'
+  origin: 'http://localhost:3000',
+  credentials: true
 }));
+//app.use(cookieParser());
 
 const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true'
 const HTTP_PORT = parseInt(process.env.HTTP_PORT_NUMBER)
@@ -56,7 +59,7 @@ app.post('/signup', async (req, res) => {
     
     console.log('Recieved email:', email);
 
-    const generatedSalt = await generateSalt();
+    const generatedSalt = generateSalt();
     const hashedPassword = await hashPassword(password, generatedSalt);
     console.log(hashedPassword);
 
@@ -66,19 +69,26 @@ app.post('/signup', async (req, res) => {
 
     const newToken = await createNewSession(newUserId);
 
+    let emailExists;
+
     if (emailExists === true) {
       setTimeout(() => {
         res.status(406).json({ message: 'This email is already registered to an account.' });
       }, 1000);
     }
     else{
-      setTimeout(() => {
-        res.status(201).json({ message: 'User registered successfully' });
-      }, 1000);
+      res.cookie('session-cookie', newToken, {
+        httpOnly: true,
+        secure: process.env.HTTPS_ENABLED === true,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/'
+      });
+      res.status(201).json({ message: 'User registered successfully' });
     }
 
   } catch (error) {
-    res.status(400).json({ message: "Could not create account" });
+    res.status(400).json({ message: error.message });
   }
   
 })

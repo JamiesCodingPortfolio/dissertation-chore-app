@@ -71,13 +71,14 @@ const addNewUser = async (name, email, hashedPassword, salt) => {
 
         const lowercaseEmail = email.toLowerCase().trim();
 
-        const emailExists = await checkEmailExists(lowercaseEmail);
-        if (emailExists) {
+        let emailExists;
+
+        emailExists = await checkEmailExists(lowercaseEmail);
+        if (emailExists === true) {
             throw new Error('Email already registered');
         }
-
-        if (emailExists === null) {
-            throw new Error('Could not verify email availability');
+        else {
+            emailExists = false;
         }
 
         if (!mongoose.connection?.db) {
