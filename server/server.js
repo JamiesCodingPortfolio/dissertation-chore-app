@@ -7,7 +7,7 @@ import { dirname, join } from 'path';
 import cors from 'cors';
 //import cookieParser from 'cookie-parser'
 
-import { addNewUser, connectDB, checkEmailExists, createNewSession } from './database/database-connections.js';
+import { checkLoginValidity, checkSessionExists, addNewUser, connectDB, checkEmailExists, createNewSession } from './database/database-connections.js';
 import { hashPassword, generateSalt } from './auth/passwordHasher.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -66,7 +66,7 @@ app.post('/signup', async (req, res) => {
     const newUserId = await addNewUser(name, email, hashedPassword, generatedSalt);
 
     console.log(newUserId)
-
+    
     const newToken = await createNewSession(newUserId);
 
     let emailExists;
@@ -91,4 +91,37 @@ app.post('/signup', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
   
+})
+
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    console.log('Recieved email:', email);
+
+    const userInfo = await checkLoginValidity(email, password);
+
+    if (userInfo != null){
+      console.log(userInfo);
+
+      const sessionToken = await createNewSession(userInfo);
+
+      res.cookie('session-cookie', sessionToken, {
+        httpOnly: true,
+        secure: process.env.HTTPS_ENABLED === true,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/'
+      });
+
+      res.status(201).json({ message: 'Login successful' });
+    }
+
+    else{
+      throw new Error ("Error logging in");
+    }
+
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 })

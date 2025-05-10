@@ -5,9 +5,12 @@ import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 
 import { hashTokens } from '../auth/hashToken.js'
+import { hashPassword } from '../auth/passwordHasher.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+
 
 dotenv.config({ path: join(__dirname, '../../.env') });
 
@@ -135,4 +138,73 @@ const createNewSession = async (userId) => {
     }
 }
 
-export { createNewSession, addNewUser, connectDB, checkEmailExists };
+const checkSessionExists = async (token) => {
+try {
+    if (!mongoose.connection?.db) {
+        await connectDB();
+    }
+
+    const tokenHash = hashTokens(token);
+
+    const sessions = mongoose.connection.db.collection('Sessions');
+        const session = await sessions.findOne({ 
+        tokenHash
+    });
+
+    return !!session;
+
+    } catch (error) {
+        console.error('Session validation error:', error);
+        throw new Error('Failed to verify session');
+    }
+}
+
+const checkLoginValidity = async (userEmail, password) => {
+    try{
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        if (typeof userEmail !== 'string' || userEmail.trim() === '') {
+                throw new Error('Invalid email input');
+        }
+
+        const users = mongoose.connection.db.collection('Users');
+        const result = await users.findOne({
+            email: userEmail.trim()
+        });
+
+        if (!result) {
+            throw new Error('User not found');
+        }
+
+        if (!result.hashedPassword || !result.salt) {
+                throw new Error('Invalid user record');
+        }
+
+        if (result.email === userEmail.trim()) {
+            console.log('User found');
+        }
+
+        const inputHash = await hashPassword(
+            password, 
+            result.salt.normalize()
+        );
+
+        const isValid = crypto.timingSafeEqual(
+            Buffer.from(inputHash, 'hex'),
+            Buffer.from(result.hashedPassword.normalize(), 'hex')
+        );
+
+        if (isValid) {
+            return result._id;
+        } else {
+            throw new Error ("Email or password is incorrect")
+}
+    } catch (error) {
+        console.error('Login validation error:', error);
+        throw new Error(error);
+    }
+}
+
+export { checkLoginValidity, checkSessionExists, createNewSession, addNewUser, connectDB, checkEmailExists };
