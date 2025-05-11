@@ -8,6 +8,7 @@ import Signup from './Signup'
 import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { useRef } from 'react';
+import Dashboard from './private-pages/dashboard'
 
 function AnimatedRoutes () {
   const location = useLocation()
@@ -28,6 +29,7 @@ function AnimatedRoutes () {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/dashboard" element={<Dashboard />}></Route>
             </Routes>
           </div>
         )}

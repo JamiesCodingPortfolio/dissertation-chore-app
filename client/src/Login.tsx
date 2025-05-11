@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react'
 import appLogo from './assets/App Logo.svg'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import './App.css'
 import './Login.css'
 const Login = () => {
@@ -9,6 +9,8 @@ const Login = () => {
   const [password, setPassword] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [isError, setIsError] = useState<boolean>(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,6 +38,8 @@ const Login = () => {
       setIsError(false);
       setEmail('');
       setPassword('');
+      
+      navigate('/dashboard');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An unknown error occurred';
       setMessage(message);
