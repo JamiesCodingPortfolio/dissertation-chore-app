@@ -5,9 +5,17 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import cors from 'cors';
-//import cookieParser from 'cookie-parser'
+import cookieParser from 'cookie-parser'
 
-import { checkLoginValidity, checkSessionExists, addNewUser, connectDB, checkEmailExists, createNewSession } from './database/database-connections.js';
+import { 
+findUserFromSession, 
+userInAnyHouseCheck, 
+checkLoginValidity, 
+checkSessionExists, 
+addNewUser, 
+connectDB, 
+createNewSession } from './database/database-connections.js';
+
 import { hashPassword, generateSalt } from './auth/passwordHasher.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,7 +30,7 @@ app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true
 }));
-//app.use(cookieParser());
+app.use(cookieParser());
 
 const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true'
 const HTTP_PORT = parseInt(process.env.HTTP_PORT_NUMBER)
@@ -125,3 +133,34 @@ app.post('/login', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 })
+
+app.get('/dashboard', async (req, res) => {
+try {
+  console.log('Cookies:', req.cookies);
+  const token = req.cookies['session-cookie'];
+
+  if (!token) return res.status(401).send('Unauthorized');
+
+  const isValid = await checkSessionExists(token);
+  const user = await findUserFromSession(token);
+  const houses = await userInAnyHouseCheck(user);
+  
+  if (!isValid) {
+    res.clearCookie('session-cookie');
+    console.log('Invalid Session');
+    return res.status(401).send('Invalid session');
+  }
+
+  if (houses.length < 1){
+    return res.status(200).json({
+      message: 'Authenticated',
+      houses
+    });
+  }
+
+
+  
+} catch (error) {
+  res.status(500).send('Server error');
+}
+});

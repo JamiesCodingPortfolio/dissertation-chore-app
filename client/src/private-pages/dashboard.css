@@ -8,11 +8,13 @@
 
 .dashboard-logo-container{
     display: flex;
+    flex-direction: column;
     justify-content: center;
     width: 75%;
     height: 12%;
     align-items: center;
     margin-top: 5%;
+    gap: 10%;
 }
 
 .dashboard-title-text{
@@ -21,6 +23,13 @@
         font-family: "Encode Sans", sans-serif;
         color: #494848;
         font-weight: 900;
+    }
+}
+
+.chores-todo-text{
+    h2{
+        font-size: 32px;
+        font-family: "Encode Sans Semi Expanded", sans-serif;
     }
 }
 

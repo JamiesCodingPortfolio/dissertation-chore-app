@@ -1,9 +1,51 @@
-import appLogo from '../assets/App Logo.svg'
-import { Link } from 'react-router-dom'
-import '../App.css'
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import appLogo from '../assets/App Logo.svg';
+import '../App.css';
 import './dashboard.css'
 
+interface House {
+  _id: string;
+  name: string;
+}
+
 const Dashboard = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [houses, setHouses] = useState<House[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const verifySession = async () => {
+      try {
+        console.log("Mounted");
+        const response = await fetch('http://localhost:8080/dashboard', {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          navigate('/login');
+          return;
+        }
+        
+        const data: { message: string; houses: House[] } = await response.json();
+        console.log('Response from server:', data.message);
+
+        setHouses(data.houses || []);
+
+        if (houses.length < 1){
+          //navigate('/new-house')
+        }
+
+      } catch (error) {
+        console.error('Session verification failed:', error);
+        navigate('/login');
+      }
+    };
+
+    verifySession();
+  }, [navigate]);
+    
   return (
     <>
       <div className='dashboard-body'>
@@ -14,6 +56,11 @@ const Dashboard = () => {
               <h1>
                 Summary
               </h1>
+            </div>
+            <div className='chores-todo-text'>
+              <h2>
+                Chores to do: 
+              </h2>
             </div>
           </div>
         </div>

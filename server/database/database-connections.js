@@ -14,7 +14,7 @@ const __dirname = dirname(__filename);
 
 dotenv.config({ path: join(__dirname, '../../.env') });
 
-const connectDB = async () => {
+export const connectDB = async () => {
     try {
         await mongoose.connect(process.env.DB_KEY, {
         });
@@ -27,7 +27,7 @@ const connectDB = async () => {
     }
 };
 
-const checkEmailExists = async (email) => {
+export const checkEmailExists = async (email) => {
     try {
         if (typeof email !== 'string' || email.trim() === '') {
             throw new Error('Invalid email input');
@@ -54,7 +54,7 @@ const checkEmailExists = async (email) => {
     }
 };
 
-const addNewUser = async (name, email, hashedPassword, salt) => {
+export const addNewUser = async (name, email, hashedPassword, salt) => {
     try {
 
         if (typeof name !== 'string'){
@@ -110,7 +110,7 @@ const addNewUser = async (name, email, hashedPassword, salt) => {
     }
 }
 
-const createNewSession = async (userId) => {
+export const createNewSession = async (userId) => {
     try {
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -138,20 +138,20 @@ const createNewSession = async (userId) => {
     }
 }
 
-const checkSessionExists = async (token) => {
-try {
-    if (!mongoose.connection?.db) {
-        await connectDB();
-    }
+export const checkSessionExists = async (token) => {
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
 
-    const tokenHash = hashTokens(token);
+        const tokenHash = hashTokens(token);
 
-    const sessions = mongoose.connection.db.collection('Sessions');
-        const session = await sessions.findOne({ 
-        tokenHash
-    });
+        const sessions = mongoose.connection.db.collection('Sessions');
+            const session = await sessions.findOne({ 
+            tokenHash
+        });
 
-    return !!session;
+        return !!session;
 
     } catch (error) {
         console.error('Session validation error:', error);
@@ -159,7 +159,28 @@ try {
     }
 }
 
-const checkLoginValidity = async (userEmail, password) => {
+export const findUserFromSession = async (token) => {
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const tokenHash = hashTokens(token);
+
+        const sessions = mongoose.connection.db.collection('Sessions');
+            const session = await sessions.findOne({ 
+            tokenHash
+        });
+
+        return session.userId;
+
+    } catch (error) {
+        console.error('Session validation error:', error);
+        throw new Error('Failed to verify session');
+    }
+}
+
+export const checkLoginValidity = async (userEmail, password) => {
     try{
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -207,4 +228,43 @@ const checkLoginValidity = async (userEmail, password) => {
     }
 }
 
-export { checkLoginValidity, checkSessionExists, createNewSession, addNewUser, connectDB, checkEmailExists };
+//House DB function
+
+export const userInAnyHouseCheck = async (userId) => {
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const userIdInput = new mongoose.Types.ObjectId(`${userId}`)
+
+        const users = mongoose.connection.db.collection('Users');
+        const result = await users.findOne(
+            { _id: userIdInput },
+            { projection: { houseIds: 1 } 
+        });
+
+        if (!result || !Array.isArray(result.houseIds) || result.houseIds.length === 0) {
+        return [];
+    }
+    } catch (error) {
+        throw new Error ("Error:", error);
+    }
+}
+
+export const findHouse = async (houseId) => {
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const houses = mongoose.connection.db.collection('Houses');
+        const houseIdInput = new mongoose.Types.ObjectId(`${houseId}`);
+
+        const result = await houses.findOne({
+            _id: houseId,
+        })
+    } catch (error) {
+        
+    }
+}
