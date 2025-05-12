@@ -259,12 +259,48 @@ export const findHouse = async (houseId) => {
         }
 
         const houses = mongoose.connection.db.collection('Houses');
+
         const houseIdInput = new mongoose.Types.ObjectId(`${houseId}`);
 
-        const result = await houses.findOne({
-            _id: houseId,
-        })
+        const result = await houses.findOne(
+            { _id: houseIdInput },
+            { projection: { _id: 0, name: 1 } }
+        );
+
+        return result?.name || null;
+
     } catch (error) {
         
+    }
+}
+
+export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+        if (!houseName?.trim()) {
+            throw new Error('House name is required');
+        }
+        if (!Number.isInteger(maxHouseholdMembers) || maxHouseholdMembers <= 0) {
+            throw new Error('Invalid maximum household members value');
+        }
+
+        const houses = mongoose.connection.db.collection('Houses');
+
+        const creatorId = mongoose.Types.ObjectId(`${userId}`);
+
+        const newHouse = {
+            creatorUserId: creatorId,
+            houseName: houseName,
+            userIds: [(creatorId)],
+            maxHouseholdMembers
+        }
+
+        const result = await houses.insertOne(newHouse);
+
+    } catch (error) {
+        console.error('Error creating new house:', error);
+        throw new Error(error.message || 'Failed to create new house');
     }
 }

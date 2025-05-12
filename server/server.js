@@ -14,7 +14,9 @@ checkLoginValidity,
 checkSessionExists, 
 addNewUser, 
 connectDB, 
-createNewSession } from './database/database-connections.js';
+createNewSession, 
+findHouse,
+newHouse} from './database/database-connections.js';
 
 import { hashPassword, generateSalt } from './auth/passwordHasher.js';
 
@@ -158,9 +160,47 @@ try {
     });
   }
 
+  const houseDetails = [];
+
+  for (const house of houses) {
+    const detail = await findHouse(house._id); // Assuming house objects have _id
+    if (!detail) continue;
+    
+    console.log(`Checking house: ${detail.name}`);
+    houseDetails.push(detail);
+  }
+
+  return res.status(200).json({
+    message: 'Authenticated with houses',
+    houses: houseDetails
+  });
 
   
 } catch (error) {
   res.status(500).send('Server error');
 }
 });
+
+app.get('/new-house', async (req, res) => {
+  try {
+  console.log('Cookies:', req.cookies);
+  const token = req.cookies['session-cookie'];
+  const { houseName, maxMembers } = req.body;
+
+  if (!token) return res.status(401).send('Unauthorized');
+
+  const isValid = await checkSessionExists(token);
+  const user = await findUserFromSession(token);
+
+  if (!isValid) {
+    res.clearCookie('session-cookie');
+    console.log('Invalid Session');
+    return res.status(401).send('Invalid session');
+  }
+
+  newHouse(user, houseName, maxMembers)
+
+  } catch (error) {
+    
+  }
+})

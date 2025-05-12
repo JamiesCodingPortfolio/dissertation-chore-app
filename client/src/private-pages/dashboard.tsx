@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import appLogo from '../assets/App Logo.svg';
 import '../App.css';
 import './dashboard.css'
 
