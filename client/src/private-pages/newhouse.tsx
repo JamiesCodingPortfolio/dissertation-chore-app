@@ -1,10 +1,10 @@
 import { useState, FormEvent } from 'react'
-import appLogo from './assets/App Logo.svg'
+import appLogo from '../assets/App Logo.svg'
 import { Link, useNavigate } from 'react-router-dom'
 import '../Signup.css'
 import './newhouse.css'
-import './App.css'
-const newHouse = () => {
+import '../App.css'
+const NewHouse = () => {
   
   const [houseName, setHouseName] = useState<string>('');
   const [maxMembers, setMaxMembers] = useState<number>(1);
@@ -14,6 +14,11 @@ const newHouse = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!houseName.trim() || maxMembers < 1) {
+      setMessage("Please enter valid house name and member count");
+      setIsError(true);
+      return;
+    }
 
     try {
       const response = await fetch('http://localhost:8080/new-house', {
@@ -23,23 +28,21 @@ const newHouse = () => {
         },
         credentials: 'include',
         body: JSON.stringify({ 
-          houseName,
-          maxMembers
+          houseName: houseName.trim(),
+          maxMembers: Math.max(1, maxMembers)
         }),
       });
 
-      const data = await response.json();
+      const data = response.ok ? await response.json() : null;
 
       if (!response.ok) {
         throw new Error(data.message || 'Registration Failed');
       }
 
-      setMessage(data.message);
+      setMessage(data?.message || 'House created successfully!');
       setIsError(false);
-      setHouseName('');
-      setMaxMembers(1);
-      
-      navigate('/dashboard');
+
+      setTimeout(() => navigate('/dashboard'), 2000);
 
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -70,20 +73,23 @@ const newHouse = () => {
           id="name"
           name="name"
           className="border rounded-lg p-2 text-center"
-          placeholder="Enter your name"
+          placeholder="Enter house name"
           value={houseName}
           onChange={(e) => setHouseName(e.target.value)}
           required
         />
-        <label htmlFor="email" className="text-gray-600">Email</label>
+        <label htmlFor="maxMembers" className="text-gray-600">Maximum members in house</label>
         <input
-          type="email"
-          id="email"
-          name="email"
+          type="number"
+          id="maxMembers"
+          name="maxMembers"
+          min="1"
+          max="20"
+          step="1"
           className="border rounded-lg p-2 text-center"
-          placeholder="Enter your email"
+          placeholder="Minimum: 1"
           value={maxMembers}
-          onChange={(e) => setMaxMembers(Number(e.target.value))}
+          onChange={(e) => setMaxMembers(Math.max(1, Number(e.target.value) || 1))}
           required
         />
         <button 
@@ -103,4 +109,4 @@ const newHouse = () => {
   )
 }
 
-export default newHouse;
+export default NewHouse;

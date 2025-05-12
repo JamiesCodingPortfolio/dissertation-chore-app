@@ -138,7 +138,6 @@ app.post('/login', async (req, res) => {
 
 app.get('/dashboard', async (req, res) => {
 try {
-  console.log('Cookies:', req.cookies);
   const token = req.cookies['session-cookie'];
 
   if (!token) return res.status(401).send('Unauthorized');
@@ -181,13 +180,15 @@ try {
 }
 });
 
-app.get('/new-house', async (req, res) => {
+app.post('/new-house', async (req, res) => {
   try {
   console.log('Cookies:', req.cookies);
   const token = req.cookies['session-cookie'];
   const { houseName, maxMembers } = req.body;
 
   if (!token) return res.status(401).send('Unauthorized');
+
+  console.log(houseName, maxMembers);
 
   const isValid = await checkSessionExists(token);
   const user = await findUserFromSession(token);
@@ -198,9 +199,11 @@ app.get('/new-house', async (req, res) => {
     return res.status(401).send('Invalid session');
   }
 
-  newHouse(user, houseName, maxMembers)
+  newHouse(user, houseName, maxMembers);
+
+  return res.status(200);
 
   } catch (error) {
-    
+    res.status(400).json({ message: error.message });
   }
-})
+});

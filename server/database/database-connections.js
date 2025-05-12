@@ -287,8 +287,9 @@ export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
         }
 
         const houses = mongoose.connection.db.collection('Houses');
+        const users = mongoose.connection.db.collection('Users');
 
-        const creatorId = mongoose.Types.ObjectId(`${userId}`);
+        const creatorId = new mongoose.Types.ObjectId(`${userId}`);
 
         const newHouse = {
             creatorUserId: creatorId,
@@ -297,10 +298,16 @@ export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
             maxHouseholdMembers
         }
 
-        const result = await houses.insertOne(newHouse);
+        const houseResult = await houses.insertOne(newHouse);
+
+        const updateUser = await users.updateOne(
+            { _id: creatorId },
+            { $addToSet: { houseIds: houseResult.insertedId } }
+        );
+        console.log(newHouse);
 
     } catch (error) {
         console.error('Error creating new house:', error);
-        throw new Error(error.message || 'Failed to create new house');
+        throw new Error(error.message);
     }
 }

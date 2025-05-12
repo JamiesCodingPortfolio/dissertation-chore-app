@@ -33,12 +33,12 @@ const Dashboard = () => {
         setHouses(data.houses || []);
 
         if (houses.length < 1){
-          //navigate('/new-house')
+          navigate('/new-house')
         }
 
       } catch (error) {
         console.error('Session verification failed:', error);
-        navigate('/login');
+        //navigate('/login');
       }
     };
 
