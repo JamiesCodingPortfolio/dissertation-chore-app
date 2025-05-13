@@ -162,7 +162,7 @@ try {
   const houseDetails = [];
 
   for (const house of houses) {
-    const detail = await findHouse(house._id); // Assuming house objects have _id
+    const detail = await findHouse(house._id);
     if (!detail) continue;
     
     console.log(`Checking house: ${detail.name}`);
