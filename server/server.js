@@ -208,9 +208,12 @@ app.post('/new-house', async (req, res) => {
     return res.status(401).send('Invalid session');
   }
 
-  newHouse(user, houseName, maxMembers);
+  await newHouse(user, houseName, maxMembers);
 
-  return res.status(200);
+  console.log("Operation successful")
+  res.status(201).json({ 
+      message: 'House created successfully',
+    });
 
   } catch (error) {
     res.status(400).json({ message: error.message });

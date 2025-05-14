@@ -80,7 +80,23 @@ const Dashboard = () => {
               </h1>
             </div>
             <div className='houses-container'>
-
+              {houses.map((houseName, index) => (
+                <div key={index} className="house-entry">
+                  <span className="house-name"><h1>{houseName}</h1></span>
+                  <div className="house-actions">
+                    <button className="house-button edit-button">
+                      <h1>
+                        Edit
+                      </h1>
+                    </button>
+                    <button className="house-button delete-button">
+                        <h1>
+                          Delete
+                        </h1>
+                      </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

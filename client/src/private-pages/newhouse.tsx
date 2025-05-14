@@ -33,17 +33,21 @@ const NewHouse = () => {
         }),
       });
 
-      const data = response.ok ? await response.json() : null;
-
       if (!response.ok) {
-        throw new Error(data.message || 'Registration Failed');
+        throw new Error('Registration Failed');
       }
 
-      setMessage(data?.message || 'House created successfully!');
+      console.log("Response status:", response.status)
+
       setIsError(false);
+      setMessage('House created successfully!');
+      
+      const timeoutId = setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
 
-      setTimeout(() => navigate('/dashboard'), 2000);
-
+      return () => clearTimeout(timeoutId);
+      
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An unknown error occurred';
       setMessage(message);
@@ -53,7 +57,7 @@ const NewHouse = () => {
 
   return (
     <div
-      className="signup-container grid bg-white rounded-[30px]">
+      className="container grid bg-white rounded-[30px]">
       <div className='logo-container'>
         <div className="app-logo">
           <Link to="/">

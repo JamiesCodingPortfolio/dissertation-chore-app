@@ -12,34 +12,21 @@ export const updateUserValidationSchema = async () => {
     // Define the JSON schema validation
     const validator = {
       $jsonSchema: {
-        bsonType: "object",
-        required: ["_id", "hashedPassword", "salt", "username", "email"],
+        bsonType: 'object',
+        required: [
+          '_id',
+          'userId',
+          'createdOn'
+        ],
         properties: {
           _id: {
-            bsonType: "objectId"
+            bsonType: 'objectId'
           },
-          hashedPassword: {
-            bsonType: "string"
+          UserID: {
+            bsonType: 'objectId'
           },
-          salt: {
-            bsonType: "string"
-          },
-          username: {
-            bsonType: "string",
-            minLength: 3,
-            maxLength: 30,
-            pattern: "^[a-zA-Z0-9_]+$"
-          },
-          email: {
-            bsonType: "string",
-            pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-          },
-          houseIds: {
-            bsonType: "array",
-            description: "Optional list of house ObjectId's",
-            items: {
-              bsonType: "objectId"
-            }
+          createdOn: {
+            bsonType: 'date'
           }
         }
       }

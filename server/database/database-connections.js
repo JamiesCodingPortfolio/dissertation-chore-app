@@ -318,6 +318,8 @@ export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
             { $addToSet: { houseIds: houseResult.insertedId } }
         );
         console.log(newHouse);
+        
+        return;
 
     } catch (error) {
         console.error('Error creating new house:', error);

@@ -49,6 +49,53 @@
     }
 }
 
+.houses-container{
+    display: flex;
+    flex-direction: column;
+    width:95%;
+    height: 80%;
+    justify-content: start;
+}
+
+.house-entry{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    h1{
+        font-size: 36px;
+        font-family: "Encode Sans", sans-serif;
+        color: #494848;
+        font-weight: 400;
+        line-height: 1.2;
+    }
+}
+
+.house-actions{
+    display: flex;
+    flex-direction: row;
+    gap: 5%;
+}
+
+.house-button{
+    flex-direction: row;
+    width: auto;
+    height: auto;
+    background-color: #E2848C;
+    cursor: pointer;
+    transform-origin: center;
+    padding: 5%;
+    border-radius: 25px;
+    h1{
+        font-family: "Encode Sans", sans-serif;
+        font-weight: 600;
+        font-size: 32px;
+        color: white;
+        cursor: pointer;
+    }
+}
+
 .dashboard-container{
     display: flex;
     justify-content: start;
@@ -62,7 +109,7 @@
     justify-content: start;
     flex-direction: column;
     align-items: center;
-    gap: 15%;
+    gap: 10%;
 }
 
 @media (min-width: 843px) and (max-width: 1920px) {
