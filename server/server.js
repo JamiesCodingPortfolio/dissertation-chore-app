@@ -143,14 +143,22 @@ try {
   if (!token) return res.status(401).send('Unauthorized');
 
   const isValid = await checkSessionExists(token);
-  const user = await findUserFromSession(token);
-  const houses = await userInAnyHouseCheck(user);
   
-  if (!isValid) {
+  console.log("isValid:" ,isValid)
+  
+  if (isValid == null) {
     res.clearCookie('session-cookie');
     console.log('Invalid Session');
     return res.status(401).send('Invalid session');
   }
+
+  const user = await findUserFromSession(token);
+
+  console.log("User:", user);
+
+  const houses = await userInAnyHouseCheck(user);
+  
+  console.log("Houses:", houses);
 
   if (houses.length < 1){
     return res.status(200).json({
@@ -162,10 +170,11 @@ try {
   const houseDetails = [];
 
   for (const house of houses) {
-    const detail = await findHouse(house._id);
+    console.log("House:", house)
+    const detail = await findHouse(house);
     if (!detail) continue;
     
-    console.log(`Checking house: ${detail.name}`);
+    console.log(`Checking house: ${detail}`);
     houseDetails.push(detail);
   }
 

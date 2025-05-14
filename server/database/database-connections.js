@@ -147,11 +147,11 @@ export const checkSessionExists = async (token) => {
         const tokenHash = hashTokens(token);
 
         const sessions = mongoose.connection.db.collection('Sessions');
-            const session = await sessions.findOne({ 
+        const session = await sessions.findOne({ 
             tokenHash
         });
 
-        return !!session;
+        return session !== null;
 
     } catch (error) {
         console.error('Session validation error:', error);
@@ -236,7 +236,7 @@ export const userInAnyHouseCheck = async (userId) => {
             await connectDB();
         }
 
-        const userIdInput = new mongoose.Types.ObjectId(`${userId}`)
+        const userIdInput = userId;
 
         const users = mongoose.connection.db.collection('Users');
         const result = await users.findOne(
@@ -244,9 +244,14 @@ export const userInAnyHouseCheck = async (userId) => {
             { projection: { houseIds: 1 } 
         });
 
-        if (!result || !Array.isArray(result.houseIds) || result.houseIds.length === 0) {
-        return [];
-    }
+        console.log(result.houseIds);
+
+        if (!result || !result.houseIds) {
+            return [];
+        }
+
+        return result.houseIds.map(id => id);
+
     } catch (error) {
         throw new Error ("Error:", error);
     }
@@ -262,15 +267,23 @@ export const findHouse = async (houseId) => {
 
         const houseIdInput = new mongoose.Types.ObjectId(`${houseId}`);
 
+        console.log("houseIdInput:", houseIdInput)
+
         const result = await houses.findOne(
             { _id: houseIdInput },
-            { projection: { _id: 0, name: 1 } }
+            { projection: { _id: 1, houseName: 1 } }
         );
 
-        return result?.name || null;
+        console.log("houseIdInput:", result?.houseName);
+
+        if (result?.houseName === null){
+            return null;
+        }
+        return result?.houseName;
 
     } catch (error) {
-        
+        console.error('Error finding house:', error);
+        return null;
     }
 }
 

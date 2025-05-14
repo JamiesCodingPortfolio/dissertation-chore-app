@@ -22,23 +22,25 @@ const Dashboard = () => {
           credentials: 'include'
         });
 
-        if (!response.ok) {
+        if (response.status === 401) {
           navigate('/login');
           return;
         }
         
-        const data: { message: string; houses: House[] } = await response.json();
+        const data = await response.json();
+
         console.log('Response from server:', data.message);
 
         setHouses(data.houses || []);
 
-        if (houses.length < 1){
+        console.log(data.houses)
+
+        if (data.houses.length < 1){
           navigate('/new-house')
         }
 
       } catch (error) {
         console.error('Session verification failed:', error);
-        //navigate('/login');
       }
     };
 
@@ -76,6 +78,9 @@ const Dashboard = () => {
               <h1>
                 Houses
               </h1>
+            </div>
+            <div className='houses-container'>
+
             </div>
           </div>
         </div>
