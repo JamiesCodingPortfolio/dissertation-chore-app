@@ -57,7 +57,7 @@ const NewHouse = () => {
 
   return (
     <div
-      className="container grid bg-white rounded-[30px]">
+      className="container new-house-container grid bg-white rounded-[30px]">
       <div className='logo-container'>
         <div className="app-logo">
           <Link to="/">

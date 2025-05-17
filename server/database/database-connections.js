@@ -428,5 +428,13 @@ export const newChore = async (choreName, choreDescription, houseName, userId) =
 }
 
 export const distributeChores = async () =>{
+try {
 
+    if (!mongoose.connection?.db) {
+        await connectDB();
+    }
+    
+} catch (error) {
+    
+}
 }
