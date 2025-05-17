@@ -315,6 +315,37 @@ export const findHouseFromName = async (houseName) => {
     }
 }
 
+export const findUsersInHouse = async (houseId) => {
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const houses = mongoose.connection.db.collection('Houses');
+
+        const houseIdInput = new mongoose.Types.ObjectId(`${houseId}`);
+
+        console.log("houseIdInput:", houseIdInput)
+
+        const result = await houses.findOne(
+            { _id: houseIdInput },
+            { projection: { userIds: 1 } }
+        );
+
+        console.log("houseIdInput:", result?.houseName);
+
+        if (result?.houseName === null){
+            return null;
+        }
+        return result?.userIds.map((oid) => oid.toString());
+
+    } catch (error) {
+        console.error('Error finding users in house:', error);
+        return null;
+    }
+}
+
+
 export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
     try {
         if (!mongoose.connection?.db) {
@@ -397,5 +428,5 @@ export const newChore = async (choreName, choreDescription, houseName, userId) =
 }
 
 export const distributeChores = async () =>{
-    
+
 }
