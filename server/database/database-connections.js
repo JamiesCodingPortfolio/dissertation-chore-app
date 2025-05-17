@@ -287,6 +287,34 @@ export const findHouse = async (houseId) => {
     }
 }
 
+export const findHouseFromName = async (houseName) => {
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const houses = mongoose.connection.db.collection('Houses');
+        
+
+        console.log("House Name Provided:", houseName)
+
+        const result = await houses.findOne(
+            { houseName },
+            { projection: { _id: 1 } }
+        );
+
+        if (!result) {
+            return null;
+        }
+
+        return result?._id;
+
+    } catch (error) {
+        console.error('Error finding house:', error);
+        return null;
+    }
+}
+
 export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
     try {
         if (!mongoose.connection?.db) {
@@ -325,4 +353,49 @@ export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
         console.error('Error creating new house:', error);
         throw new Error(error.message);
     }
+}
+
+//Chore Database Logic
+
+export const newChore = async (choreName, choreDescription, houseName, userId) => {
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+        if (!choreName?.trim()) {
+            throw new Error('Chore name is required');
+        }
+        if (!choreDescription?.trim()) {
+            throw new Error('Chore Description is required');
+        }
+        
+        const houseId = await findHouseFromName(houseName);
+
+        if (!houseId){
+            throw new Error('Could not find house provided')
+        }
+        
+        const chores = mongoose.connection.db.collection('Chore');
+
+        const newChore = {
+            name: choreName,
+            description: choreDescription,
+            houseId: houseId,
+            createdBy: userId
+        }
+
+        const choreResult = await chores.insertOne(newChore);
+
+        console.log(choreResult);
+        
+        return;
+
+    } catch (error) {
+        console.error('Error creating new chore:', error);
+        throw new Error(error.message);
+    }
+}
+
+export const distributeChores = async () =>{
+    
 }

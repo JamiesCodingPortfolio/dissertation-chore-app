@@ -16,7 +16,8 @@ addNewUser,
 connectDB, 
 createNewSession, 
 findHouse,
-newHouse} from './database/database-connections.js';
+newHouse,
+newChore} from './database/database-connections.js';
 
 import { hashPassword, generateSalt } from './auth/passwordHasher.js';
 
@@ -217,5 +218,31 @@ app.post('/new-house', async (req, res) => {
 
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+});
+
+app.post('/new-chore', async (req, res)  =>{
+  try {
+    console.log('Cookies', req.cookies);
+    const token = req.cookies['session-cookie'];
+    const { name, houseName, description } = req.body;
+
+    if (!token) return res.status(401).send('Unauthorized');
+
+    console.log(name, houseName, description);
+
+    const isValid = await checkSessionExists(token);
+    const user = await findUserFromSession(token);
+
+    if (!isValid) {
+      res.clearCookie('session-cookie');
+      console.log('Invalid Session');
+      return res.status(401).send('Invalid session');
+    }
+
+    await newChore(name, description, houseName, user)
+
+  } catch (error) {
+    
   }
 });
