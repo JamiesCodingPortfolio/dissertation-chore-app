@@ -66,8 +66,8 @@ if (HTTPS_ENABLED){
   )
 
   httpsServer.listen(HTTPS_PORT, '0.0.0.0', () => {
-    console.log(`HTTPS Server started on port ${HTTPS_PORT}`)
-  })
+    console.log(`HTTPS Server started on port ${HTTPS_PORT}`);
+  });
 }
 
 else{

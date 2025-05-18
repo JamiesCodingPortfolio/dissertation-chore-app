@@ -21,7 +21,12 @@ const NewHouse = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/new-house', {
+
+      const domain = import.meta.env.VITE_DOMAIN_NAME
+      ? (import.meta.env.VITE_DOMAIN_NAME as string)
+      : 'http://localhost:8080'
+
+      const response = await fetch(`${domain}/new-house`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
