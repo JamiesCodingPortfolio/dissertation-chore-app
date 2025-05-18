@@ -15,6 +15,7 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '../../.env') });
 
 export const connectDB = async () => {
+    console.log("Connecting to database");
     try {
         await mongoose.connect(process.env.DB_KEY, {
         });
@@ -28,6 +29,7 @@ export const connectDB = async () => {
 };
 
 export const checkEmailExists = async (email) => {
+    console.log("Running function checkEmailExists");
     try {
         if (typeof email !== 'string' || email.trim() === '') {
             throw new Error('Invalid email input');
@@ -55,6 +57,7 @@ export const checkEmailExists = async (email) => {
 };
 
 export const addNewUser = async (name, email, hashedPassword, salt) => {
+    console.log("Running function addNewUser");
     try {
 
         if (typeof name !== 'string'){
@@ -111,6 +114,7 @@ export const addNewUser = async (name, email, hashedPassword, salt) => {
 }
 
 export const createNewSession = async (userId) => {
+    console.log("Running function createNewSession");
     try {
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -139,6 +143,7 @@ export const createNewSession = async (userId) => {
 }
 
 export const checkSessionExists = async (token) => {
+    console.log("Running function checkSessionExists");
     try {
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -160,6 +165,7 @@ export const checkSessionExists = async (token) => {
 }
 
 export const findUserFromSession = async (token) => {
+    console.log("Running function findUserFromSession");
     try {
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -181,6 +187,7 @@ export const findUserFromSession = async (token) => {
 }
 
 export const checkLoginValidity = async (userEmail, password) => {
+    console.log("Running function checkLoginValidity");
     try{
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -231,6 +238,7 @@ export const checkLoginValidity = async (userEmail, password) => {
 //House DB function
 
 export const userInAnyHouseCheck = async (userId) => {
+    console.log("Running function userInAnyHouseCheck");
     try {
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -258,6 +266,7 @@ export const userInAnyHouseCheck = async (userId) => {
 }
 
 export const findHouse = async (houseId) => {
+    console.log("Running function findHouse");
     try {
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -288,6 +297,7 @@ export const findHouse = async (houseId) => {
 }
 
 export const findHouseFromName = async (houseName) => {
+    console.log("Running function findHouseFromName");
     try {
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -316,6 +326,7 @@ export const findHouseFromName = async (houseName) => {
 }
 
 export const findUsersInHouse = async (houseId) => {
+    console.log("Running function findUsersInHouse");
     try {
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -347,6 +358,7 @@ export const findUsersInHouse = async (houseId) => {
 
 
 export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
+    console.log("Running function newHouse");
     try {
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -389,6 +401,7 @@ export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
 //Chore Database Logic
 
 export const newChore = async (choreName, choreDescription, houseName, userId) => {
+    console.log("Running function newChore");
     try {
         if (!mongoose.connection?.db) {
             await connectDB();
@@ -402,16 +415,23 @@ export const newChore = async (choreName, choreDescription, houseName, userId) =
         
         const houseId = await findHouseFromName(houseName);
 
+        console.log(houseId);
+
         if (!houseId){
             throw new Error('Could not find house provided')
         }
         
         const chores = mongoose.connection.db.collection('Chore');
 
+        const assignedUserId = await distributeChores(houseId)
+
+        console.log("Assigned User Id", assignedUserId)
+
         const newChore = {
             name: choreName,
             description: choreDescription,
             houseId: houseId,
+            assignedUserId: assignedUserId,
             createdBy: userId
         }
 
@@ -427,14 +447,64 @@ export const newChore = async (choreName, choreDescription, houseName, userId) =
     }
 }
 
-export const distributeChores = async () =>{
-try {
+export const distributeChores = async (houseId) =>{
+    console.log("Running function distributeChores");
+    try {
 
-    if (!mongoose.connection?.db) {
-        await connectDB();
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+        
+        const chores = mongoose.connection.db.collection('Chore');
+
+        const checkChores = [
+        { $match: { houseId: houseId } },
+        { 
+            $group: {
+            _id: '$assignedUserId',
+            count: { $sum: 1 }
+            }
+        }
+        ];
+
+        const result = await chores.aggregate(checkChores).toArray();
+
+        console.log("Result:", result)
+
+        const counts = {};
+        for (const doc of result) {
+            counts[doc._id.toString()] = doc.count;
+        }
+
+        const entries = Object.entries(counts);
+
+        if (entries.length <= 1) {
+            console.log('Users assigned to chores.', entries.length);
+            const userIds = await findUsersInHouse(houseId);
+
+            const randomIndex = Math.floor(Math.random() * userIds.length);
+            const randomUserId = userIds[randomIndex];
+            console.log(randomUserId);
+
+            return randomUserId;
+        }
+        else {
+            const minCount = Math.min(...entries.map(([, count]) => count));
+
+            const usersWithMin = entries
+            .filter(([, count]) => count === minCount)
+            .map(([userId]) => userId);
+
+            if (usersWithMin.length > 1){
+                const randomIndex = Math.floor(Math.random() * userIds.length);
+                const randomUserId = usersWithMin[randomIndex];
+                console.log(randomUserId);
+            }
+        }
+
+        console.log(counts); 
+
+    } catch (error) {
+        console.error('Error creating distributing chores:', error);
     }
-    
-} catch (error) {
-    
-}
 }

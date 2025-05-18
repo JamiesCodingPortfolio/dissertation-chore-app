@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import './dashboard.css'
 
@@ -94,7 +94,7 @@ const Dashboard = () => {
             </div>
             <div className='chores-todo-text'>
               <h2>
-                Chores to do: 
+                Chores for you to do: 
               </h2>
             </div>
           </div>
@@ -161,10 +161,16 @@ const Dashboard = () => {
           </div>
 
           <div className="dashboard-small-container bg-white rounded-[30px]">
-            <div className='small-container-header'>
+            <div className='small-container-header justify-evenly flex flex-row'>
+              <button className='bg-[#E2848C] text-white rounded-lg p-2 mt-4 hover:bg-[#d8737b]'>
+                New
+              </button>
               <h1>
                 Houses
               </h1>
+              <button className='bg-[#E2848C] text-white rounded-lg p-2 mt-4 hover:bg-[#d8737b]'>
+                Join
+              </button>
             </div>
             <div className='houses-container'>
               {houses.map((h) => (

@@ -39,9 +39,9 @@ const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true'
 const HTTP_PORT = parseInt(process.env.HTTP_PORT_NUMBER)
 const HTTPS_PORT = parseInt(process.env.HTTPS_PORT_NUMBER)
 
-console.log(HTTP_PORT);
+//console.log(HTTP_PORT);
 
-connectDB();
+await connectDB();
 
 if (HTTPS_ENABLED){
 
