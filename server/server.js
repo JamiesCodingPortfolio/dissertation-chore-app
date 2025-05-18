@@ -28,18 +28,30 @@ dotenv.config({ path: join(__dirname, '../.env') });
 
 const app = express();
 
+const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true'
+const HTTP_PORT = parseInt(process.env.HTTP_PORT_NUMBER)
+const HTTPS_PORT = parseInt(process.env.HTTPS_PORT_NUMBER)
+const DOMAIN = process.env.VITE_DOMAIN_NAME
+
+let originPoint;
+
+if (DOMAIN === ''){
+  originPoint = "http://localhost:3000";
+}
+else{
+  originPoint = `https://${DOMAIN}`;
+}
+
+//console.log(HTTP_PORT);
+
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: originPoint,
   credentials: true
 }));
 app.use(cookieParser());
 
-const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true'
-const HTTP_PORT = parseInt(process.env.HTTP_PORT_NUMBER)
-const HTTPS_PORT = parseInt(process.env.HTTPS_PORT_NUMBER)
 
-//console.log(HTTP_PORT);
 
 await connectDB();
 
