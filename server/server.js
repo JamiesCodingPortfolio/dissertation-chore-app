@@ -31,26 +31,65 @@ const app = express();
 const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true'
 const HTTP_PORT = parseInt(process.env.HTTP_PORT_NUMBER)
 const HTTPS_PORT = parseInt(process.env.HTTPS_PORT_NUMBER)
-const DOMAIN = process.env.VITE_DOMAIN_NAME
 
-let originPoint;
+const corsOptions = {
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "https://j-brown.uk",
+      "https://www.j-brown.uk",
+      "http://localhost:3000"
+    ];
+    
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    // Normalize origin for comparison
+    const normalizedOrigin = origin.endsWith('/') 
+      ? origin.slice(0, -1) 
+      : origin;
 
-if (DOMAIN === ''){
-  originPoint = "http://localhost:3000";
-}
-else{
-  originPoint = `https://${DOMAIN}`;
-}
+    // Check against allowed origins with protocol and domain variations
+    if (
+      allowedOrigins.some(allowed => 
+        normalizedOrigin === allowed ||
+        normalizedOrigin.replace(/^https?:\/\/(www\.)?/, 'https://') === allowed
+      )
+    ) {
+      callback(null, true);
+    } else {
+      console.error('Blocked by CORS:', normalizedOrigin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 
-//console.log(HTTP_PORT);
+app.use((req, res, next) => {
+  // Normalize origin headers
+  if (req.headers.origin) {
+    req.headers.origin = req.headers.origin
+      .replace('http://', 'https://')
+      .replace('//www.', '//');
+  }
+  
+  // Set CORS headers explicitly
+  const origin = req.headers.origin;
+  if (origin && (
+    origin.includes('j-brown.uk') || 
+    origin.includes('localhost:3000')
+  )) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+  next();
+});
 
-app.use(express.json());
-app.use(cors({
-  origin: originPoint,
-  credentials: true
-}));
 app.use(cookieParser());
-
+app.use(express.json());
 
 
 await connectDB();
@@ -61,7 +100,13 @@ if (HTTPS_ENABLED){
   const certificate = fs.readFileSync(join(__dirname, '../certificate.crt'), 'utf-8');
 
   const httpsServer = https.createServer(
-    { key: privateKey, cert: certificate },
+    { key: privateKey, cert: certificate,
+
+      SNICallback: (servername, cb) => {
+        cb(null, httpsServer);
+      }
+
+    },
     app
   )
 
@@ -75,6 +120,8 @@ else{
     console.log(`Server running on port ${HTTP_PORT}`);
   })
 }
+
+app.options('/signup', cors(corsOptions));
 
 app.post('/signup', async (req, res) => {
   try {
@@ -114,7 +161,11 @@ app.post('/signup', async (req, res) => {
     res.status(400).json({ message: error.message });
   }
   
-})
+});
+
+app.get('/', (req, res) => {
+  res.status(200).send('Server is running!');
+});
 
 app.post('/login', async (req, res) => {
   try {

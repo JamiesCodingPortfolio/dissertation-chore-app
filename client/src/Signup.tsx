@@ -21,12 +21,15 @@ const Signup = () => {
       ? (import.meta.env.VITE_DOMAIN_NAME as string)
       : 'http://localhost:8080'
       
+      console.log("Domain Name: ", domain);
+
       const response = await fetch(`${domain}/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
+        mode: 'cors',
         body: JSON.stringify({ 
           email, 
           password,
