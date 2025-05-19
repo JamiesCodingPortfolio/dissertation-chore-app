@@ -8,7 +8,8 @@ const Dashboard = () => {
   const [choreName, setChoreName] = useState('');
   const [selectedHouse, setSelectedHouse] = useState<string>('');
   const [description, setDescription] = useState('');
-  const [chores, setChores] = useState()
+  const [chores, setChores] = useState<number>(0);
+  const [refreshCounter, setRefreshCounter] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,6 +34,7 @@ const Dashboard = () => {
 
         console.log(data.houses);
         console.log(data.chores);
+        setChores(data.chores.length);
 
         if (data.houses.length < 1){
           navigate('/new-house')
@@ -44,7 +46,7 @@ const Dashboard = () => {
     };
 
     verifySession();
-  }, [navigate]);
+  }, [navigate, refreshCounter],);
 
   const handleChoreSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +78,7 @@ const Dashboard = () => {
       setChoreName('');
       setDescription('');
 
+      setRefreshCounter(prev => prev + 1);
 
     } catch (error) {
       console.error('Error:', error);
@@ -96,7 +99,7 @@ const Dashboard = () => {
             </div>
             <div className='chores-todo-text'>
               <h2>
-                Chores for you to do: {data.chores.length}
+                Chores for you to do: {chores}
               </h2>
             </div>
           </div>

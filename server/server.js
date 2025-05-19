@@ -46,7 +46,7 @@ else{
 //console.log(HTTP_PORT);
 
 app.use(cors({
-  origin: originPoint,
+  origin: true,
   credentials: true
 }));
 
