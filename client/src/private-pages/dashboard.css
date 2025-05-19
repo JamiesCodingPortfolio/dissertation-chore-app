@@ -49,6 +49,10 @@
     }
 }
 
+.new-chore-container-header{
+    position:relative;
+    width: 100%;
+}
 
 .chore-form{
     display: flex;

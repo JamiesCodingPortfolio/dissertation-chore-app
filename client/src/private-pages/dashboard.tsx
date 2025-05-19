@@ -22,7 +22,7 @@ const Dashboard = () => {
         });
 
         if (response.status === 401) {
-          navigate('/login');
+          navigate('/');
           return;
         }
         
@@ -30,15 +30,25 @@ const Dashboard = () => {
 
         console.log('Response from server:', data.message);
 
-        setHouses(data.houses || []);
+        console.log(data)
 
-        console.log(data.houses);
-        console.log(data.chores);
-        setChores(data.chores.length);
-
-        if (data.houses.length < 1){
-          navigate('/new-house')
+        if (Array.isArray(data.houses)) {
+          setHouses(data.houses);
+          // Check for empty houses HERE after state update
+          if (data.houses.length === 0) {
+            navigate('/new-house');
+          }
+        } else {
+          console.error('Invalid houses data:', data.houses);
+          setHouses([]);
+          navigate('/new-house');
         }
+
+        // Fix chores state type
+        setChores(data.chores?.length || 0);
+
+        console.log("Houses", houses);
+        console.log("Chores", chores);
 
       } catch (error) {
         console.error('Session verification failed:', error);
@@ -46,7 +56,7 @@ const Dashboard = () => {
     };
 
     verifySession();
-  }, [navigate, refreshCounter],);
+  }, [navigate, refreshCounter]);
 
   const handleChoreSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +94,26 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error:', error);
     }
-  }
+  };
+
+  const handleLogout = async () => {
+  try {
+    const response = await fetch('http://localhost:8080/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Chore Failed');
+    }
+
+    navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
     
   return (
     <>
@@ -109,11 +138,19 @@ const Dashboard = () => {
         <div className='smaller-containers'>
 
           <div className="dashboard-small-container bg-white rounded-[30px]">
-            <div className='small-container-header'>
-              <h1>
+            <div className='small-container-header new-chore-container-header flex justify-center relative'>
+              <h1 className='text-center'>
                 New Chore
               </h1>
+              <div className='absolute right-8 top p-5 bg-[#E2848C] text-white rounded-lg'>
+                <button onClick={handleLogout}>
+                  <span>
+                    <h2>Logout</h2>
+                  </span>
+                </button>
+              </div>
             </div>
+            
             <div className='new-chore-container'>
 
               <form onSubmit={handleChoreSubmit} className='chore-form'>
@@ -168,13 +205,13 @@ const Dashboard = () => {
 
           <div className="dashboard-small-container  bg-white rounded-[30px]">
             <div className='small-container-header houses-container-header flex flex-row'>
-              <button className='bg-[#E2848C] text-white rounded-lg p-2 mt-4 hover:bg-[#d8737b]'>
+              <button className='bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b]'>
                 New
               </button>
               <h1>
                 Houses
               </h1>
-              <button className='bg-[#E2848C] text-white rounded-lg p-2 mt-4 hover:bg-[#d8737b]'>
+              <button className='bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b]'>
                 Join
               </button>
             </div>

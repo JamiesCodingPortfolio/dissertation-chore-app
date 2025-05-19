@@ -274,6 +274,11 @@ app.post('/new-chore', async (req, res)  =>{
     });
 
   } catch (error) {
-    
+    res.status(400).json({ message: error.message });
   }
+});
+
+app.post('/logout', (req, res) => {
+  res.clearCookie('session-cookie');
+  res.status(200).json({ message: 'Logged out successfully' });
 });
