@@ -220,7 +220,9 @@ const Dashboard = () => {
                 <div key={h} className="house-entry">
                   <span className="house-name"><h1>{h}</h1></span>
                   <div className="house-actions">
-                    <button className="house-button edit-button">
+                    <button className="house-button edit-button"
+                    onClick={() => navigate(`/edit-house/${encodeURIComponent(h)}`)}
+                    >
                       <h1>
                         Edit
                       </h1>
