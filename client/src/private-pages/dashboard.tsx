@@ -77,6 +77,7 @@ const Dashboard = () => {
 
       setChoreName('');
       setDescription('');
+      setSelectedHouse('');
 
       setRefreshCounter(prev => prev + 1);
 

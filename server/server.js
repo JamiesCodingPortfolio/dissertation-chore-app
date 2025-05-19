@@ -268,6 +268,11 @@ app.post('/new-chore', async (req, res)  =>{
 
     await newChore(name, description, houseName, user)
 
+    res.status(201).json({ 
+      success: true,
+      message: 'Chore created successfully',
+    });
+
   } catch (error) {
     
   }
