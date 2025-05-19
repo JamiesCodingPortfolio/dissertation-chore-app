@@ -58,6 +58,12 @@
     text-align: center;
 }
 
+.houses-container-header{
+    justify-content: space-between;
+    align-items: center;
+    width: 80%
+}
+
 .houses-container{
     display: flex;
     flex-direction: column;

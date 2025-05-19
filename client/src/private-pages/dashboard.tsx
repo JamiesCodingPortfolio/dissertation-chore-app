@@ -166,8 +166,8 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="dashboard-small-container bg-white rounded-[30px]">
-            <div className='small-container-header justify-evenly flex flex-row'>
+          <div className="dashboard-small-container  bg-white rounded-[30px]">
+            <div className='small-container-header houses-container-header flex flex-row'>
               <button className='bg-[#E2848C] text-white rounded-lg p-2 mt-4 hover:bg-[#d8737b]'>
                 New
               </button>
