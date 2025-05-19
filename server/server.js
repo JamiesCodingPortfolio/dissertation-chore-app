@@ -17,7 +17,8 @@ connectDB,
 createNewSession, 
 findHouse,
 newHouse,
-newChore} from './database/database-connections.js';
+newChore,
+findChoresAssignedToUser} from './database/database-connections.js';
 
 import { hashPassword, generateSalt } from './auth/passwordHasher.js';
 
@@ -201,9 +202,12 @@ try {
     houseDetails.push(detail);
   }
 
+  const userChores = await findChoresAssignedToUser(user);
+
   return res.status(200).json({
     message: 'Authenticated with houses',
-    houses: houseDetails
+    houses: houseDetails,
+    chores: userChores
   });
 
   

@@ -508,3 +508,39 @@ export const distributeChores = async (houseId) =>{
         console.error('Error creating distributing chores:', error);
     }
 }
+
+export const findChoresAssignedToUser = async (userId) => {
+    console.log("Running function findChoresAssignedToUser userId: ", userId);
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+        
+        const chores = mongoose.connection.db.collection('Chore');
+
+        const userIdString = userId.toString();
+
+        const pipeline = [
+            { 
+                $match: { 
+                    assignedUserId: userIdString
+                } 
+            },
+            {
+                $project: {
+                    _id: 0,
+                    name: 1,
+                    description: 1
+                }
+            }
+        ];
+
+        const result = await chores.aggregate(pipeline).toArray();
+        console.log(result);
+        return result;
+
+    } catch (error) {
+        console.error('Error fetching user chores:', error);
+        return []; // Return empty array on error
+    }
+}

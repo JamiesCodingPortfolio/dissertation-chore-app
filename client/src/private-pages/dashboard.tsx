@@ -8,6 +8,7 @@ const Dashboard = () => {
   const [choreName, setChoreName] = useState('');
   const [selectedHouse, setSelectedHouse] = useState<string>('');
   const [description, setDescription] = useState('');
+  const [chores, setChores] = useState()
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,7 +31,8 @@ const Dashboard = () => {
 
         setHouses(data.houses || []);
 
-        console.log(data.houses)
+        console.log(data.houses);
+        console.log(data.chores);
 
         if (data.houses.length < 1){
           navigate('/new-house')
@@ -94,7 +96,7 @@ const Dashboard = () => {
             </div>
             <div className='chores-todo-text'>
               <h2>
-                Chores for you to do: 
+                Chores for you to do: {data.chores.length}
               </h2>
             </div>
           </div>
