@@ -18,7 +18,12 @@ createNewSession,
 findHouse,
 newHouse,
 newChore,
-findChoresAssignedToUser} from './database/database-connections.js';
+findChoresAssignedToUser,
+findHouseFromName,
+modifyHouseName,
+deleteHouse,
+getUserById, 
+findUsersInHouse } from './database/database-connections.js';
 
 import { hashPassword, generateSalt } from './auth/passwordHasher.js';
 
@@ -278,7 +283,121 @@ app.post('/new-chore', async (req, res)  =>{
   }
 });
 
+app.put('/update-house', async (req, res) => {
+  try {
+    console.log("Update house requested")
+    const { originalName, newName } = req.body;
+    
+    const token = req.cookies['session-cookie'];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    
+    const isValid = await checkSessionExists(token);
+    if (!isValid) {
+      res.clearCookie('session-cookie');
+      return res.status(401).json({ error: 'Invalid session' });
+    }
+
+    const houseId = await findHouseFromName(originalName);
+
+    console.log("House ID: ", houseId)
+    
+    const result = await modifyHouseName(houseId, newName)
+
+    if (result){
+      console.log('Changes made to houseId: ', houseId);
+    }
+    else{
+      console.log('No changes made to houseId: ', houseId);
+    }
+
+    console.log(result)
+
+    if (result === 0) {
+      return res.status(404).json({ error: 'House not found / changes not made' });
+    }
+
+    res.json({ success: true, newName });
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/verify-session', async (req, res) => {
+  try {
+    const token = req.cookies['session-cookie'];
+    if (!token) return res.json({ isAuthenticated: false });
+
+    const isValid = await checkSessionExists(token);
+    res.json({ isAuthenticated: isValid });
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/delete-house', async (req, res) => {
+  try {
+    const { houseName } = req.body;
+    const token = req.cookies['session-cookie'];
+    
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const isValid = await checkSessionExists(token);
+    if (!isValid) {
+      res.clearCookie('session-cookie');
+      return res.status(401).json({ error: 'Invalid session' });
+    }
+
+    const houseId = await findHouseFromName(houseName);
+    if (!houseId) {
+      return res.status(404).json({ error: 'House not found' });
+    }
+    console.log("Provided houseId: ", houseId)
+    await deleteHouse(houseId);
+    res.json({ success: true });
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/house-members', async (req, res) => {
+  try {
+    const { houseName } = req.body;
+    const token = req.cookies['session-cookie'];
+    
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    
+    const isValid = await checkSessionExists(token);
+    if (!isValid) {
+      res.clearCookie('session-cookie');
+      return res.status(401).json({ error: 'Invalid session' });
+    }
+
+    const houseId = await findHouseFromName(houseName);
+    if (!houseId) {
+      return res.status(404).json({ error: 'House not found' });
+    }
+
+    const userIds = await findUsersInHouse(houseId);
+    const members = await Promise.all(
+      userIds.map(async (userId) => {
+        const user = await getUserById(userId);
+        return user.username;
+      })
+    );
+
+    console.log("Members:", members);
+
+    res.json({ members });
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/logout', (req, res) => {
   res.clearCookie('session-cookie');
   res.status(200).json({ message: 'Logged out successfully' });
 });
+

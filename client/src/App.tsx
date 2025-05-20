@@ -43,8 +43,31 @@ function AnimatedRoutes () {
 }
 
 function Home() {
-  // example of imperative navigation:
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const verifySession = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/verify-session', {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        if (!response.ok) throw new Error('Session check failed');
+        
+        const { isAuthenticated } = await response.json();
+        console.log("Session valid:", isAuthenticated);
+
+        if (isAuthenticated) {
+          navigate('/dashboard');
+        }
+      } catch (error) {
+        console.error("Session verification error:", error);
+      }
+    };
+
+    verifySession();
+  }, [navigate]);
 
   return (
     <>

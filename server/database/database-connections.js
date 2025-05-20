@@ -113,6 +113,30 @@ export const addNewUser = async (name, email, hashedPassword, salt) => {
     }
 }
 
+export const getUserById = async (userId) => {
+    console.log("Running function getUserById");
+    try {
+    if (!mongoose.connection?.db) {
+        await connectDB();
+    }
+
+    console.log(userId)
+
+    const userIdObj = new mongoose.Types.ObjectId(`${userId}`)
+
+    const users = mongoose.connection.db.collection('Users');
+    const user = await users.findOne(
+        { _id: userIdObj },
+        { projection: { username: 1 } }
+    );
+
+    return user;
+    } catch (error) {
+    console.error('Error fetching user:', error);
+    return null;
+    }
+};
+
 export const createNewSession = async (userId) => {
     console.log("Running function createNewSession");
     try {
@@ -343,9 +367,9 @@ export const findUsersInHouse = async (houseId) => {
             { projection: { userIds: 1 } }
         );
 
-        console.log("houseIdInput:", result?.houseName);
+        console.log("Result:", result?.userIds);
 
-        if (result?.houseName === null){
+        if (result?.userIds === null){
             return null;
         }
         return result?.userIds.map((oid) => oid.toString());
@@ -397,6 +421,65 @@ export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
         throw new Error(error.message);
     }
 }
+
+export const modifyHouseName = async (houseId, newHouseName) => {
+    console.log("Running function modifyHouseName");
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+        if (typeof newHouseName !== 'string' || newHouseName.trim() === '') {
+            throw new Error('New house name must be a string');
+        }
+
+        const houses = mongoose.connection.db.collection('Houses');
+        
+        console.log("Modifying houseId: ", houseId);
+        
+        const result = await houses.updateOne(
+            { _id: houseId },
+            { $set: { houseName: newHouseName } }
+        );
+
+        return result.modifiedCount === 1;
+        
+    } catch (error) {
+        console.error('Error modifying house:', error);
+        throw new Error(error.message);
+    }
+}
+
+export const deleteHouse = async (houseId) => {
+  try {
+    if (!mongoose.connection?.db) {
+      await connectDB();
+    }
+
+    const db = mongoose.connection.db;
+
+    const houses = db.collection('Houses');
+    const houseDeleteResult = await houses.deleteOne({ _id: houseId });
+    
+    if (houseDeleteResult.deletedCount === 0) {
+      throw new Error('House not found');
+    }
+
+    const users = db.collection('Users');
+    await users.updateMany(
+      { houseIds: houseId },
+      { $pull: { houseIds: houseId } }
+    );
+
+    // 3. Delete associated chores last
+    const chores = db.collection('Chore');
+    await chores.deleteMany({ houseId: houseId });
+
+    return true;
+  } catch (error) {
+    console.error('Error deleting house:', error);
+    throw new Error(error.message);
+  }
+};
 
 //Chore Database Logic
 

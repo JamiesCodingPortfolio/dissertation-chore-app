@@ -3,12 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import './dashboard.css'
 
+interface Chore {
+  name: string;
+  description: string;
+}
+
 const Dashboard = () => {
   const [houses, setHouses] = useState<string[]>([]);
   const [choreName, setChoreName] = useState('');
   const [selectedHouse, setSelectedHouse] = useState<string>('');
   const [description, setDescription] = useState('');
-  const [chores, setChores] = useState<number>(0);
+  const [chores, setChores] = useState<Chore[]>([]);
   const [refreshCounter, setRefreshCounter] = useState(0);
   const navigate = useNavigate();
 
@@ -45,7 +50,7 @@ const Dashboard = () => {
         }
 
         // Fix chores state type
-        setChores(data.chores?.length || 0);
+        setChores(data.chores || []);
 
         console.log("Houses", houses);
         console.log("Chores", chores);
@@ -129,9 +134,28 @@ const Dashboard = () => {
             </div>
             <div className='chores-todo-text'>
               <h2>
-                Chores for you to do: {chores}
+                Chores for you to do: {chores.length}
               </h2>
             </div>
+            <div className="chore-list mt-4">
+                {chores.length === 0 ? (
+                  <div className="text-gray-500 text-center">No chores assigned!</div>
+                ) : (
+                  chores.map((chore, index) => (
+                    <div 
+                      key={index}
+                      className="chore-card bg-gray-50 rounded-lg p-4 mb-3"
+                    >
+                      <div className="font-semibold text-lg text-[#E2848C]">
+                        {chore.name}
+                      </div>
+                      <div className="text-gray-600 mt-1">
+                        {chore.description}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
           </div>
         </div>
 
