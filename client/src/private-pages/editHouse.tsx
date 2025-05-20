@@ -23,7 +23,7 @@ const EditHouse = () => {
     const fetchHouseMembers = async () => {
       try {
         setMembersLoading(true);
-        const response = await fetch('http://localhost:8080/house-members', {
+        const response = await fetch('/api/house-members', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ const EditHouse = () => {
       setIsLoading(true);
       setError('');
 
-      const response = await fetch('http://localhost:8080/update-house', {
+      const response = await fetch('/api/update-house', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ const EditHouse = () => {
       setIsLoading(true);
       setError('');
 
-      const response = await fetch('http://localhost:8080/delete-house', {
+      const response = await fetch('/api/delete-house', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

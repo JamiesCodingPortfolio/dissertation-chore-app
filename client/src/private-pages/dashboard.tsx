@@ -21,7 +21,7 @@ const Dashboard = () => {
     const verifySession = async () => {
       try {
         console.log("Mounted");
-        const response = await fetch('http://localhost:8080/dashboard', {
+        const response = await fetch('/api/dashboard', {
           method: 'GET',
           credentials: 'include'
         });
@@ -69,7 +69,7 @@ const Dashboard = () => {
     console.log({ choreName, selectedHouse, description});
     try{
 
-      const response = await fetch('http://localhost:8080/new-chore', {
+      const response = await fetch('/api/new-chore', {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -103,7 +103,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
   try {
-    const response = await fetch('http://localhost:8080/logout', {
+    const response = await fetch('/api/logout', {
       method: 'POST',
       credentials: 'include'
     });

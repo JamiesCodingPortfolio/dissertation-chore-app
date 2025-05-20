@@ -23,7 +23,7 @@ const Signup = () => {
       
       console.log("Domain Name: ", domain);
 
-      const response = await fetch(`${domain}/signup`, {
+      const response = await fetch(`/api/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

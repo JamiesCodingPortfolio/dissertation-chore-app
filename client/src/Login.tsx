@@ -17,11 +17,7 @@ const Login = () => {
     
     try {
 
-      const domain = import.meta.env.VITE_DOMAIN_NAME
-      ? (import.meta.env.VITE_DOMAIN_NAME as string)
-      : 'http://localhost:8080'
-
-      const response = await fetch(`${domain}/login`, {
+      const response = await fetch(`/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

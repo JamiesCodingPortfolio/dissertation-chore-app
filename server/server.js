@@ -34,6 +34,8 @@ dotenv.config({ path: join(__dirname, '../.env') });
 
 const app = express();
 
+app.use(express.static('dist'));
+
 const HTTPS_ENABLED = process.env.HTTPS_ENABLED === 'true'
 const HTTP_PORT = parseInt(process.env.HTTP_PORT_NUMBER)
 const HTTPS_PORT = parseInt(process.env.HTTPS_PORT_NUMBER)
@@ -45,13 +47,13 @@ if (DOMAIN === ''){
   originPoint = "http://localhost:3000";
 }
 else{
-  originPoint = `https://${DOMAIN}`;
+  originPoint = `${DOMAIN}`;
 }
 
 //console.log(HTTP_PORT);
 
 app.use(cors({
-  origin: true,
+  origin: originPoint,
   credentials: true
 }));
 
@@ -67,13 +69,7 @@ if (HTTPS_ENABLED){
   const certificate = fs.readFileSync(join(__dirname, '../certificate.crt'), 'utf-8');
 
   const httpsServer = https.createServer(
-    { key: privateKey, cert: certificate,
-
-      SNICallback: (servername, cb) => {
-        cb(null, httpsServer);
-      }
-
-    },
+    { key: privateKey, cert: certificate},
     app
   )
 
@@ -88,7 +84,7 @@ else{
   })
 }
 
-app.post('/signup', async (req, res) => {
+app.post('/api/signup', async (req, res) => {
   try {
     const { email, password, name } = req.body;
     
@@ -128,11 +124,11 @@ app.post('/signup', async (req, res) => {
   
 });
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
   res.status(200).send('Server is running!');
 });
 
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -165,7 +161,7 @@ app.post('/login', async (req, res) => {
   }
 })
 
-app.get('/dashboard', async (req, res) => {
+app.get('/api/dashboard', async (req, res) => {
 try {
   const token = req.cookies['session-cookie'];
 
@@ -221,7 +217,7 @@ try {
 }
 });
 
-app.post('/new-house', async (req, res) => {
+app.post('/api/new-house', async (req, res) => {
   try {
   console.log('Cookies:', req.cookies);
   const token = req.cookies['session-cookie'];
@@ -252,7 +248,7 @@ app.post('/new-house', async (req, res) => {
   }
 });
 
-app.post('/new-chore', async (req, res)  =>{
+app.post('/api/new-chore', async (req, res)  =>{
   try {
     console.log('Cookies', req.cookies);
     const token = req.cookies['session-cookie'];
@@ -283,7 +279,7 @@ app.post('/new-chore', async (req, res)  =>{
   }
 });
 
-app.put('/update-house', async (req, res) => {
+app.put('/api/update-house', async (req, res) => {
   try {
     console.log("Update house requested")
     const { originalName, newName } = req.body;
@@ -336,7 +332,7 @@ app.get('/api/verify-session', async (req, res) => {
   }
 });
 
-app.delete('/delete-house', async (req, res) => {
+app.delete('/api/delete-house', async (req, res) => {
   try {
     const { houseName } = req.body;
     const token = req.cookies['session-cookie'];
@@ -361,7 +357,7 @@ app.delete('/delete-house', async (req, res) => {
   }
 });
 
-app.post('/house-members', async (req, res) => {
+app.post('/api/house-members', async (req, res) => {
   try {
     const { houseName } = req.body;
     const token = req.cookies['session-cookie'];
@@ -396,7 +392,7 @@ app.post('/house-members', async (req, res) => {
   }
 });
 
-app.post('/logout', (req, res) => {
+app.post('/api/logout', (req, res) => {
   res.clearCookie('session-cookie');
   res.status(200).json({ message: 'Logged out successfully' });
 });

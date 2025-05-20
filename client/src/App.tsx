@@ -50,7 +50,7 @@ function Home() {
   useEffect(() => {
     const verifySession = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/verify-session', {
+        const response = await fetch('/api/verify-session', {
           method: 'GET',
           credentials: 'include'
         });
