@@ -540,52 +540,39 @@ export const distributeChores = async (houseId) =>{
         
         const chores = mongoose.connection.db.collection('Chore');
 
+        const userIds = await findUsersInHouse(houseId); 
+
         const checkChores = [
-        { $match: { houseId: houseId } },
-        { 
-            $group: {
-            _id: '$assignedUserId',
-            count: { $sum: 1 }
-            }
-        }
+            { $match: { houseId, assignedUserId: { $in: userIds } } },
+            { $group: { _id: '$assignedUserId', count: { $sum: 1 } } }
         ];
 
         const result = await chores.aggregate(checkChores).toArray();
 
-        console.log("Result:", result)
-
-        const counts = {};
-        for (const doc of result) {
-            counts[doc._id.toString()] = doc.count;
+        const counts = userIds.reduce((map, userId) => {
+            map[userId] = 0;
+            return map;
+        }, {});
+        
+        for (const { _id, count } of result) {
+            counts[_id] = count;
         }
 
-        const entries = Object.entries(counts);
+        const entries = Object.entries(counts); 
 
-        if (entries.length <= 1) {
-            console.log('Users assigned to chores.', entries.length);
-            const userIds = await findUsersInHouse(houseId);
+        const minCount = Math.min(...entries.map(([, countValue]) => countValue));
 
-            const randomIndex = Math.floor(Math.random() * userIds.length);
-            const randomUserId = userIds[randomIndex];
-            console.log(randomUserId);
+        const candidates = entries
+        .filter(([, countValue]) => countValue === minCount)
+        .map(([userId]) => userId);
 
-            return randomUserId;
-        }
-        else {
-            const minCount = Math.min(...entries.map(([, count]) => count));
+        const selectedUserId =
+        candidates.length === 1
+            ? candidates[0]
+            : candidates[Math.floor(Math.random() * candidates.length)];
 
-            const usersWithMin = entries
-            .filter(([, count]) => count === minCount)
-            .map(([userId]) => userId);
-
-            if (usersWithMin.length > 1){
-                const randomIndex = Math.floor(Math.random() * userIds.length);
-                const randomUserId = usersWithMin[randomIndex];
-                console.log(randomUserId);
-            }
-        }
-
-        console.log(counts); 
+        console.log('Assigning to user:', selectedUserId);
+        return selectedUserId;
 
     } catch (error) {
         console.error('Error creating distributing chores:', error);

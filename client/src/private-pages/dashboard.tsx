@@ -52,8 +52,8 @@ const Dashboard = () => {
         // Fix chores state type
         setChores(data.chores || []);
 
-        console.log("Houses", houses);
-        console.log("Chores", chores);
+        console.log("Houses", data.houses);
+        console.log("Chores", data.chores);
 
       } catch (error) {
         console.error('Session verification failed:', error);
@@ -137,25 +137,29 @@ const Dashboard = () => {
                 Chores for you to do: {chores.length}
               </h2>
             </div>
-            <div className="chore-list mt-4">
-                {chores.length === 0 ? (
-                  <div className="text-gray-500 text-center">No chores assigned!</div>
-                ) : (
-                  chores.map((chore, index) => (
-                    <div 
-                      key={index}
-                      className="chore-card bg-gray-50 rounded-lg p-4 mb-3"
-                    >
-                      <div className="font-semibold text-lg text-[#E2848C]">
-                        {chore.name}
-                      </div>
-                      <div className="text-gray-600 mt-1">
-                        {chore.description}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
+          </div>
+          <div className="chore-list mt-4 overflow-scroll">
+            {chores.length === 0 ? (
+              <div className="text-gray-500 text-center">No chores assigned!</div>
+            ) : (
+              chores.map((chore, index) => (
+                <div 
+                  key={index}
+                  className="chore-card bg-gray-50 rounded-lg p-4 mb-3"
+                >
+                  <div className="font-semibold text-lg text-[#E2848C]">
+                    <h1>
+                      Chore name: {chore.name}
+                    </h1>
+                  </div>
+                  <div className="text-gray-600 mt-1">
+                    <h1>
+                      Description: {chore.description}
+                    </h1>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

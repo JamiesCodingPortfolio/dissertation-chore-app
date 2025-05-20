@@ -133,6 +133,12 @@
     gap: 2.5%;
 }
 
+.chore-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0 1rem;
+}
+
 @media (min-width: 843px) and (max-width: 1920px) {
     .dashboard-container {
         width: 42.5vw;
