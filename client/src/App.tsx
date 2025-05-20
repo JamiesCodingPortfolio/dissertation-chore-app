@@ -26,7 +26,7 @@ function AnimatedRoutes () {
         timeout={300}
         unmountOnExit
       >
-        {(state) => (
+        {() => (
           <div className="transition-wrapper">
             <Routes location={location}>                                  
               <Route path="/" element={<Home />} />
@@ -155,7 +155,7 @@ function App() {
       }
       
       const data = await response.json();
-      console.log("Connection Established");
+      console.log("Connection Established", data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }

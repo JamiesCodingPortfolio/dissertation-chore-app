@@ -170,7 +170,7 @@ const Dashboard = () => {
               <h1 className='text-center'>
                 New Chore
               </h1>
-              <div className='absolute right-8 top p-5 bg-[#E2848C] text-white rounded-lg'>
+              <div className='absolute right-8 top bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b] transition-colors cursor-pointer shadow-md hover:shadow-lg active:scale-95'>
                 <button onClick={handleLogout}>
                   <span>
                     <h2>Logout</h2>
@@ -225,7 +225,7 @@ const Dashboard = () => {
                 rows={2}
                 />
 
-                <button type='submit' className='bg-[#E2848C] text-white rounded-lg p-2 mt-4 hover:bg-[#d8737b]'>Add Chore</button>
+                <button type='submit' className='bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b] transition-colors cursor-pointer shadow-md hover:shadow-lg active:scale-95 mt-4'>Add Chore</button>
               </form>
 
             </div>
@@ -233,7 +233,7 @@ const Dashboard = () => {
 
           <div className="dashboard-small-container  bg-white rounded-[30px]">
             <div className='small-container-header houses-container-header flex flex-row'>
-              <button className='bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b]'
+              <button className='bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b] transition-colors cursor-pointer shadow-md hover:shadow-lg active:scale-95'
               onClick={() => navigate('/new-house')}
               >
                 New
@@ -241,7 +241,7 @@ const Dashboard = () => {
               <h1>
                 Houses
               </h1>
-              <button className='bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b]'
+              <button className='bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b] transition-colors cursor-pointer shadow-md hover:shadow-lg active:scale-95'
               onClick={() => navigate('/join-house')}
               >
                 Join
