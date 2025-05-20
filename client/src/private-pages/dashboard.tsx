@@ -233,13 +233,17 @@ const Dashboard = () => {
 
           <div className="dashboard-small-container  bg-white rounded-[30px]">
             <div className='small-container-header houses-container-header flex flex-row'>
-              <button className='bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b]'>
+              <button className='bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b]'
+              onClick={() => navigate('/new-house')}
+              >
                 New
               </button>
               <h1>
                 Houses
               </h1>
-              <button className='bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b]'>
+              <button className='bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b]'
+              onClick={() => navigate('/join-house')}
+              >
                 Join
               </button>
             </div>
