@@ -80,6 +80,7 @@
   display: flex;
   flex-direction: column;
   gap: 25px;
+  margin-bottom: 7%;
 }
 
 .login-button{
@@ -134,24 +135,6 @@
   transform: scale(1.05);
   h1{
     color: white
-  }
-}
-
-.google-login{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 5%;
-
-  h2{
-    font-family: "Encode Sans", sans-serif;
-    font-size: 28px;
-    font-weight: 600;
-    color: #767676;
-  }
-  img{
-    height:110px;
-    width: 110px;
   }
 }
 

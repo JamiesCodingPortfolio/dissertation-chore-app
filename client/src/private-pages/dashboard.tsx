@@ -8,8 +8,13 @@ interface Chore {
   description: string;
 }
 
+interface House {
+  name: string;
+  maxMembers: number;
+}
+
 const Dashboard = () => {
-  const [houses, setHouses] = useState<string[]>([]);
+  const [houses, setHouses] = useState<House[]>([]);
   const [choreName, setChoreName] = useState('');
   const [selectedHouse, setSelectedHouse] = useState<string>('');
   const [description, setDescription] = useState('');
@@ -207,9 +212,9 @@ const Dashboard = () => {
                   <option value="" disabled>
                     Select a house
                   </option>
-                  {houses.map((h) => (
-                    <option key={h} value={h}>
-                      {h}
+                  {houses.map((house) => (
+                    <option key={house.name} value={house.name}>
+                      {house.name}
                     </option>
                   ))}
                 </select>
@@ -248,12 +253,12 @@ const Dashboard = () => {
               </button>
             </div>
             <div className='houses-container'>
-              {houses.map((h) => (
-                <div key={h} className="house-entry">
-                  <span className="house-name"><h1>{h}</h1></span>
+              {houses.map((house) => (
+                <div key={house.name} className="house-entry">
+                  <span className="house-name"><h1>{house.name}</h1></span>
                   <div className="house-actions">
                     <button className="house-button edit-button"
-                    onClick={() => navigate(`/edit-house/${encodeURIComponent(h)}`)}
+                    onClick={() => navigate(`/edit-house/${encodeURIComponent(house.name)}`)}
                     >
                       <h1>
                         Edit

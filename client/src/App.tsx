@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import appLogo from './assets/App Logo.svg'
-import googleLogo from './assets/Google Logo.svg'
 import './App.css'
 import './transitions.css'
 import Login from './Login'
@@ -116,16 +115,6 @@ function Home() {
               </h1>
             </div>
           </Link>
-        </div>
-        <div className='google-login'>
-          <div>
-            <h2>
-              Sign in with
-            </h2>
-          </div>
-          <div>
-            <img src={googleLogo} className="google-logo" alt="Google Logo" />
-          </div>
         </div>
       </div>
     </>

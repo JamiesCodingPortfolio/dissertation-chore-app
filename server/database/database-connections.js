@@ -624,16 +624,24 @@ export const findChoresAssignedToUser = async (userId) => {
                 } 
             },
             {
+                $lookup: {
+                    from: 'Houses',
+                    localField: 'houseId',
+                    foreignField: '_id',
+                    as: 'house'
+                }
+            },
+            {
                 $project: {
                     _id: 0,
                     name: 1,
-                    description: 1
+                    description: 1,
+                    houseName: { $arrayElemAt: ['$house.houseName', 0] }
                 }
             }
         ];
 
         const result = await chores.aggregate(pipeline).toArray();
-        console.log(result);
         return result;
 
     } catch (error) {
@@ -681,4 +689,124 @@ export const createJoinRequest = async (houseId, userId) => {
     console.error('Join request creation failed:', error);
     throw error;
   }
+};
+
+export const getHouseCreatorId = async (houseName) => {
+    console.log("Running function getHouseCreatorId");
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const houses = mongoose.connection.db.collection('Houses');
+        const house = await houses.findOne(
+            { houseName },
+            { projection: { creatorUserId: 1 } }
+        );
+
+        return house?.creatorUserId || null;
+    } catch (error) {
+        console.error('Error getting house creator:', error);
+        throw new Error('Failed to get house creator');
+    }
+};
+
+export const getJoinRequests = async (houseName) => {
+    console.log("Running function getJoinRequests");
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const houses = mongoose.connection.db.collection('Houses');
+        const house = await houses.findOne({ houseName });
+        
+        if (!house) {
+            throw new Error('House not found');
+        }
+
+        const joinRequests = mongoose.connection.db.collection('JoinRequests');
+        const requests = await joinRequests.find(
+            { houseId: house._id, status: 'pending' }
+        ).toArray();
+
+        // Get usernames for each request
+        const users = mongoose.connection.db.collection('Users');
+        const requestsWithUsernames = await Promise.all(
+            requests.map(async (request) => {
+                const user = await users.findOne(
+                    { _id: request.userId },
+                    { projection: { username: 1 } }
+                );
+                return {
+                    ...request,
+                    username: user?.username || 'Unknown User'
+                };
+            })
+        );
+
+        return requestsWithUsernames;
+    } catch (error) {
+        console.error('Error getting join requests:', error);
+        throw new Error('Failed to get join requests');
+    }
+};
+
+export const handleJoinRequest = async (houseName, requesterUsername, action) => {
+    console.log("Running function handleJoinRequest");
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const houses = mongoose.connection.db.collection('Houses');
+        const house = await houses.findOne({ houseName });
+        
+        if (!house) {
+            throw new Error('House not found');
+        }
+
+        const users = mongoose.connection.db.collection('Users');
+        const requester = await users.findOne({ username: requesterUsername });
+        
+        if (!requester) {
+            throw new Error('Requester not found');
+        }
+
+        const joinRequests = mongoose.connection.db.collection('JoinRequests');
+        
+        if (action === 'accept') {
+            // Add user to house members using $push to ensure we're updating the userIds array
+            await houses.updateOne(
+                { _id: house._id },
+                { $push: { userIds: requester._id } }
+            );
+
+            // Update the user's houseIds array
+            await users.updateOne(
+                { _id: requester._id },
+                { $addToSet: { houseIds: house._id } }
+            );
+        }
+
+        // Update request status
+        await joinRequests.updateOne(
+            { 
+                houseId: house._id,
+                userId: requester._id,
+                status: 'pending'
+            },
+            { 
+                $set: { 
+                    status: action === 'accept' ? 'accepted' : 'denied',
+                    updatedAt: new Date()
+                }
+            }
+        );
+
+        return true;
+    } catch (error) {
+        console.error('Error handling join request:', error);
+        throw new Error(`Failed to ${action} join request`);
+    }
 };

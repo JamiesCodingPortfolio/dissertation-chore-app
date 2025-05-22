@@ -26,7 +26,10 @@ getUserById,
 findUsersInHouse, 
 findUserByEmail,
 findHouseDetails,
-createJoinRequest} from './database/database-connections.js';
+createJoinRequest,
+getHouseCreatorId,
+getJoinRequests,
+handleJoinRequest} from './database/database-connections.js';
 
 import { hashPassword, generateSalt } from './auth/passwordHasher.js';
 
@@ -172,8 +175,6 @@ try {
 
   const isValid = await checkSessionExists(token);
   
-  console.log("isValid:" ,isValid)
-  
   if (isValid == null) {
     res.clearCookie('session-cookie');
     console.log('Invalid Session');
@@ -181,29 +182,26 @@ try {
   }
 
   const user = await findUserFromSession(token);
-
-  console.log("User:", user);
-
   const houses = await userInAnyHouseCheck(user);
   
-  console.log("Houses:", houses);
-
   if (houses.length < 1){
     return res.status(200).json({
       message: 'Authenticated',
-      houses
+      houses: []
     });
   }
 
   const houseDetails = [];
 
-  for (const house of houses) {
-    console.log("House:", house)
-    const detail = await findHouse(house);
-    if (!detail) continue;
+  for (const houseId of houses) {
+    const house = await findHouseDetails(houseId);
+    if (!house) continue;
     
-    console.log(`Checking house: ${detail}`);
-    houseDetails.push(detail);
+    // Only send necessary information, no IDs
+    houseDetails.push({
+      name: house.houseName,
+      maxMembers: house.maxHouseholdMembers
+    });
   }
 
   const userChores = await findChoresAssignedToUser(user);
@@ -214,7 +212,6 @@ try {
     chores: userChores
   });
 
-  
 } catch (error) {
   res.status(500).send('Server error');
 }
@@ -400,6 +397,8 @@ app.post('/api/logout', (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 });
 
+//Join Request 
+
 app.post('/api/join-house', async (req, res) => {
   try{
     const { houseName, adminEmail } = req.body;
@@ -442,5 +441,120 @@ app.post('/api/join-house', async (req, res) => {
     res.status(500).json({
       message: "Failed to process join request"
     });
+  }
+});
+
+app.get('/api/current-user', async (req, res) => {
+  try {
+    const token = req.cookies['session-cookie'];
+    if (!token) return res.status(401).send('Unauthorized');
+
+    const isValid = await checkSessionExists(token);
+    if (!isValid) {
+      res.clearCookie('session-cookie');
+      return res.status(401).send('Invalid session');
+    }
+
+    const userId = await findUserFromSession(token);
+    const user = await getUserById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ username: user.username });
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/api/house-info', async (req, res) => {
+  try {
+    const token = req.cookies['session-cookie'];
+    const { houseName } = req.query;
+
+    if (!token) return res.status(401).send('Unauthorized');
+    if (!houseName) return res.status(400).json({ message: 'House name is required' });
+
+    const isValid = await checkSessionExists(token);
+    if (!isValid) {
+      res.clearCookie('session-cookie');
+      return res.status(401).send('Invalid session');
+    }
+
+    const currentUserId = await findUserFromSession(token);
+    const creatorUserId = await getHouseCreatorId(houseName);
+
+    if (!creatorUserId) {
+      return res.status(404).json({ message: 'House not found' });
+    }
+
+    // Instead of sending back the creator ID, just send whether the current user is the creator
+    const isCreator = currentUserId.toString() === creatorUserId.toString();
+    res.status(200).json({ isCreator });
+  } catch (error) {
+    console.error('Error getting house info:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/api/join-requests', async (req, res) => {
+  try {
+    const token = req.cookies['session-cookie'];
+    const { houseName } = req.query;
+
+    if (!token) return res.status(401).send('Unauthorized');
+    if (!houseName) return res.status(400).json({ message: 'House name is required' });
+
+    const isValid = await checkSessionExists(token);
+    if (!isValid) {
+      res.clearCookie('session-cookie');
+      return res.status(401).send('Invalid session');
+    }
+
+    const currentUserId = await findUserFromSession(token);
+    const creatorUserId = await getHouseCreatorId(houseName);
+
+    if (currentUserId.toString() !== creatorUserId.toString()) {
+      return res.status(403).json({ message: 'Only house creator can view join requests' });
+    }
+
+    const requests = await getJoinRequests(houseName);
+    res.status(200).json({ requests: requests.map(r => r.username) });
+  } catch (error) {
+    console.error('Error getting join requests:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.put('/api/handle-request', async (req, res) => {
+  try {
+    const token = req.cookies['session-cookie'];
+    const { houseName, requesterUsername, action } = req.body;
+
+    if (!token) return res.status(401).send('Unauthorized');
+    if (!houseName || !requesterUsername || !action) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const isValid = await checkSessionExists(token);
+    if (!isValid) {
+      res.clearCookie('session-cookie');
+      return res.status(401).send('Invalid session');
+    }
+
+    const currentUserId = await findUserFromSession(token);
+    const creatorUserId = await getHouseCreatorId(houseName);
+
+    if (currentUserId.toString() !== creatorUserId.toString()) {
+      return res.status(403).json({ message: 'Only house creator can handle join requests' });
+    }
+
+    await handleJoinRequest(houseName, requesterUsername, action);
+    res.status(200).json({ message: `Request ${action}ed successfully` });
+  } catch (error) {
+    console.error('Error handling request:', error);
+    res.status(500).json({ message: error.message });
   }
 });
