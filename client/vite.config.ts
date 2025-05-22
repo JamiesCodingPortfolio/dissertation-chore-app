@@ -13,6 +13,11 @@ const HTTPS_ENABLED = process.env.HTTPS_ENABLED === "true"
 export default defineConfig({
   server: {
     host: '0.0.0.0',
+    proxy: {
+      '/api': {
+        target: "http://localhost:8080"
+      }
+    },
     ...(HTTPS_ENABLED && {
       https: {
         key: fs.readFileSync(`../private.key`),

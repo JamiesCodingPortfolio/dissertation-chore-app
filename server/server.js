@@ -23,7 +23,10 @@ findHouseFromName,
 modifyHouseName,
 deleteHouse,
 getUserById, 
-findUsersInHouse } from './database/database-connections.js';
+findUsersInHouse, 
+findUserByEmail,
+findHouseDetails,
+createJoinRequest} from './database/database-connections.js';
 
 import { hashPassword, generateSalt } from './auth/passwordHasher.js';
 
@@ -397,3 +400,47 @@ app.post('/api/logout', (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 });
 
+app.post('/api/join-house', async (req, res) => {
+  try{
+    const { houseName, adminEmail } = req.body;
+    const token = req.cookies['session-cookie'];
+
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+      
+      const isValid = await checkSessionExists(token);
+      if (!isValid) {
+        res.clearCookie('session-cookie');
+        return res.status(401).json({ message: 'Invalid session' });
+      }
+
+    const userId = await findUserFromSession(token);
+
+    const houseId = await findHouseFromName(houseName);
+    if (!houseId) {
+      return res.status(404).json({ message: 'One or more fields are incorrect' });
+    }
+
+    const house = await findHouseDetails(houseId);
+
+    const adminUser = await findUserByEmail(adminEmail);
+
+    if (!adminUser || adminUser._id.toString() !== house.creatorUserId.toString()) {
+      return res.status(403).json({ message: 'One or more fields are incorrect' });
+    }
+
+    const requestResult = await createJoinRequest(houseId, userId);
+
+    console.log(`Request result for join request for user ${userId} for house ${houseId}: `, requestResult)
+
+    res.json({
+      success: true,
+      message: 'Join request submitted'
+    });
+
+  } catch (error) {
+    console.error('Join house error:', error);
+    res.status(500).json({
+      message: "Failed to process join request"
+    });
+  }
+});

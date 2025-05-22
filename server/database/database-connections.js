@@ -137,6 +137,21 @@ export const getUserById = async (userId) => {
     }
 };
 
+export const findUserByEmail = async (email) => {
+    console.log("Running function findUserByEmail");
+    try {
+        const users = mongoose.connection.db.collection('Users');
+        return await users.findOne({ 
+            email: email.toLowerCase().trim() 
+    });
+    } catch (error) {
+        console.error('Error finding user by email:', error);
+        return null;
+    }
+};
+
+//Login/Session functions
+
 export const createNewSession = async (userId) => {
     console.log("Running function createNewSession");
     try {
@@ -259,7 +274,7 @@ export const checkLoginValidity = async (userEmail, password) => {
     }
 }
 
-//House DB function
+//House DB functions
 
 export const userInAnyHouseCheck = async (userId) => {
     console.log("Running function userInAnyHouseCheck");
@@ -450,6 +465,7 @@ export const modifyHouseName = async (houseId, newHouseName) => {
 }
 
 export const deleteHouse = async (houseId) => {
+  console.log("Running function deleteHouse");
   try {
     if (!mongoose.connection?.db) {
       await connectDB();
@@ -479,6 +495,17 @@ export const deleteHouse = async (houseId) => {
     console.error('Error deleting house:', error);
     throw new Error(error.message);
   }
+};
+
+export const findHouseDetails = async (houseId) => {
+    console.log("Running function findHouseDetails");
+    try {
+        const houses = mongoose.connection.db.collection('Houses');
+        return await houses.findOne({ _id: houseId });
+    } catch (error) {
+        console.error('Error finding house details:', error);
+        return null;
+    }
 };
 
 //Chore Database Logic
@@ -614,3 +641,44 @@ export const findChoresAssignedToUser = async (userId) => {
         return []; // Return empty array on error
     }
 }
+
+//Join house requests
+
+export const createJoinRequest = async (houseId, userId) => {
+  try {
+    if (!mongoose.connection?.db) await connectDB();
+    
+    const joinRequests = mongoose.connection.db.collection('JoinRequests');
+    
+    // Check for existing pending request
+    const existingRequest = await joinRequests.findOne({
+      houseId,
+      userId,
+      status: 'pending'
+    });
+
+    if (existingRequest) {
+      throw new Error('Pending request already exists');
+    }
+
+    // Create new request document
+    const requestDoc = {
+      houseId,
+      userId,
+      status: 'pending',
+      requestedAt: new Date(),
+    };
+
+    const result = await joinRequests.insertOne(requestDoc);
+    
+    return {
+      insertedId: result.insertedId,
+      houseId: houseId,
+      userId: userId
+    };
+
+  } catch (error) {
+    console.error('Join request creation failed:', error);
+    throw error;
+  }
+};
