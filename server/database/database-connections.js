@@ -396,7 +396,7 @@ export const findUsersInHouse = async (houseId) => {
 }
 
 
-export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
+export const newHouse = async (userId, houseName) => {
     console.log("Running function newHouse");
     try {
         if (!mongoose.connection?.db) {
@@ -404,9 +404,6 @@ export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
         }
         if (!houseName?.trim()) {
             throw new Error('House name is required');
-        }
-        if (!Number.isInteger(maxHouseholdMembers) || maxHouseholdMembers <= 0) {
-            throw new Error('Invalid maximum household members value');
         }
 
         const houses = mongoose.connection.db.collection('Houses');
@@ -417,8 +414,7 @@ export const newHouse = async (userId, houseName, maxHouseholdMembers) => {
         const newHouse = {
             creatorUserId: creatorId,
             houseName: houseName,
-            userIds: [(creatorId)],
-            maxHouseholdMembers
+            userIds: [(creatorId)]
         }
 
         const houseResult = await houses.insertOne(newHouse);
@@ -808,5 +804,42 @@ export const handleJoinRequest = async (houseName, requesterUsername, action) =>
     } catch (error) {
         console.error('Error handling join request:', error);
         throw new Error(`Failed to ${action} join request`);
+    }
+};
+
+export const deleteChore = async (choreName, houseName, userId) => {
+    console.log("Running function deleteChore");
+    try {
+        if (!mongoose.connection?.db) {
+            await connectDB();
+        }
+
+        const chores = mongoose.connection.db.collection('Chore');
+        const houses = mongoose.connection.db.collection('Houses');
+        
+        // Get house ID from name
+        const house = await houses.findOne({ houseName });
+        if (!house) {
+            throw new Error('House not found');
+        }
+
+        // Convert userId to string for comparison since assignedUserId is stored as string
+        const userIdString = userId.toString();
+
+        // Delete the chore using the exact document structure
+        const result = await chores.deleteOne({
+            name: choreName,
+            houseId: house._id,
+            assignedUserId: userIdString
+        });
+
+        if (result.deletedCount === 0) {
+            throw new Error('Chore not found or not assigned to user');
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Error deleting chore:', error);
+        throw error;
     }
 };

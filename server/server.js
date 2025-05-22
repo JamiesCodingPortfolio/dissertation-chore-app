@@ -29,7 +29,8 @@ findHouseDetails,
 createJoinRequest,
 getHouseCreatorId,
 getJoinRequests,
-handleJoinRequest} from './database/database-connections.js';
+handleJoinRequest,
+deleteChore} from './database/database-connections.js';
 
 import { hashPassword, generateSalt } from './auth/passwordHasher.js';
 
@@ -219,30 +220,24 @@ try {
 
 app.post('/api/new-house', async (req, res) => {
   try {
-  console.log('Cookies:', req.cookies);
-  const token = req.cookies['session-cookie'];
-  const { houseName, maxMembers } = req.body;
+    const token = req.cookies['session-cookie'];
+    if (!token) return res.status(401).send('Unauthorized');
 
-  if (!token) return res.status(401).send('Unauthorized');
+    const isValid = await checkSessionExists(token);
+    if (isValid == null) {
+      res.clearCookie('session-cookie');
+      return res.status(401).send('Invalid session');
+    }
 
-  console.log(houseName, maxMembers);
+    const userId = await findUserFromSession(token);
+    const { houseName } = req.body;
 
-  const isValid = await checkSessionExists(token);
-  const user = await findUserFromSession(token);
+    if (!houseName) {
+      return res.status(400).json({ message: 'House name is required' });
+    }
 
-  if (!isValid) {
-    res.clearCookie('session-cookie');
-    console.log('Invalid Session');
-    return res.status(401).send('Invalid session');
-  }
-
-  await newHouse(user, houseName, maxMembers);
-
-  console.log("Operation successful")
-  res.status(201).json({ 
-      message: 'House created successfully',
-    });
-
+    await newHouse(userId, houseName);
+    res.status(201).json({ message: 'House created successfully' });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -557,4 +552,26 @@ app.put('/api/handle-request', async (req, res) => {
     console.error('Error handling request:', error);
     res.status(500).json({ message: error.message });
   }
+});
+
+app.delete('/api/chores/:choreName', async (req, res) => {
+    try {
+        const token = req.cookies['session-cookie'];
+        if (!token) return res.status(401).send('Unauthorized');
+
+        const isValid = await checkSessionExists(token);
+        if (!isValid) {
+            res.clearCookie('session-cookie');
+            return res.status(401).send('Invalid session');
+        }
+
+        const userId = await findUserFromSession(token);
+        const { choreName } = req.params;
+        const { houseName } = req.body;
+
+        await deleteChore(choreName, houseName, userId);
+        res.status(200).json({ message: 'Chore deleted successfully' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
 });

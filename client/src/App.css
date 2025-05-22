@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Encode+Sans:wdth,wght@100,400;100,600;100,900&family=Encode+Sans+Semi+Expanded:wght@400;600;900&display=swap');
 @import "tailwindcss";
 
-.body{
-  height:100vh;
+.body {
+  height: 100vh;
   width: 100vw;
 }
 
-.container{
+.container {
   display: flex;
   justify-content: space-between;
   flex-direction: column;
@@ -18,57 +18,60 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 585px;
-  height: 120px;
+  width: clamp(280px, 80%, 585px);
+  height: clamp(80px, 10vw, 120px);
   margin-top: 7%;
 }
 
 .app-logo {
-    transition: transform 0.3s ease;
-    transform-origin: center;
-    justify-content: start;
-  }
-  
-  .app-logo:hover {
-    transform: scale(1.2);
-  }
+  transition: transform 0.3s ease;
+  transform-origin: center;
+  justify-content: start;
+  width: clamp(70px, 8vw, 105px);
+  height: clamp(70px, 8vw, 105px);
+}
 
-  img{
-    height: 105px;
-    width: 105px;
-  }
+.app-logo:hover {
+  transform: scale(1.2);
+}
 
-.app-text{
-  h1{
-    font-size: 84px;
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.app-text {
+  h1 {
+    font-size: clamp(48px, 8vw, 84px);
     font-family: "Encode Sans Semi Expanded", sans-serif;
     font-weight: 900;
     background: linear-gradient(
-    to right,
-    #88C9D5,
-    #E2848C
+      to right,
+      #88C9D5,
+      #E2848C
     );
     -webkit-background-clip: text;
-
     -webkit-text-fill-color: transparent;
+    white-space: nowrap;
   }
 }
 
-.welcome-text{
-  h1{
-    font-size: 64px;
+.welcome-text {
+  h1 {
+    font-size: clamp(32px, 5vw, 64px);
     font-family: "Encode Sans", sans-serif;
     color: #494848;
     font-weight: 900;
   }
 }
 
-.welcome-desc{
+.welcome-desc {
   display: flex;
   flex-direction: column;
   text-align: center;
-  h2{
-    font-size: 36px;
+  h2 {
+    font-size: clamp(20px, 3vw, 36px);
     font-family: "Encode Sans", sans-serif;
     color: #494848;
     font-weight: 400;
@@ -76,70 +79,70 @@
   }
 }
 
-.buttons-container{
+.buttons-container {
   display: flex;
   flex-direction: column;
   gap: 25px;
   margin-bottom: 7%;
+  width: clamp(280px, 80%, 700px);
 }
 
-.login-button{
+.login-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 700px;
-  height: 80px;
+  width: 100%;
+  height: clamp(60px, 8vw, 80px);
   background-color: #E2848C;
   cursor: pointer;
   transform-origin: center;
-  h1{
+  h1 {
     font-family: "Encode Sans", sans-serif;
     font-weight: 600;
-    font-size: 32px;
+    font-size: clamp(24px, 3vw, 32px);
     color: white;
     cursor: pointer;
   }
 }
 
-.login-button:hover{
+.login-button:hover {
   transition: ease-in 100ms;
   border: 2px solid #E2848C;
   background-color: #81C6D2;
   transform: scale(1.05);
 }
 
-
-.signup-button{
+.signup-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 700px;
-  height: 80px;
+  width: 100%;
+  height: clamp(60px, 8vw, 80px);
   background-color: white;
   border: 2px solid #E2848C;
   border-radius: 25px;
   cursor: pointer;
   transform-origin: center;
-  h1{
+  h1 {
     font-family: "Encode Sans", sans-serif;
     font-weight: 600;
-    font-size: 32px;
+    font-size: clamp(24px, 3vw, 32px);
     color: #E2848C;
     cursor: pointer;
   }
 }
 
-.signup-button:hover{
+.signup-button:hover {
   transition: ease-in 100ms;
   background-color: #81C6D2;
   transform: scale(1.05);
-  h1{
+  h1 {
     color: white
   }
 }
 
-@media (max-width: 842px){
-  .container{
+@media (max-width: 842px) {
+  .container {
     width: 96vw;
     height: 96vh;
   }
@@ -152,9 +155,23 @@
   }
 }
 
-@media (min-width:1920px){
-  .container{
+@media (min-width: 1920px) {
+  .container {
     width: 42vw;
     height: 96vh;
+  }
+}
+
+@media (max-width: 550px) {
+  .logo-container {
+    justify-content: center;
+  }
+
+  .app-text {
+    display: none;
+  }
+
+  .app-logo {
+    margin: 0 auto;
   }
 }

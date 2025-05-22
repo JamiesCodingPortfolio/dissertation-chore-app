@@ -195,7 +195,7 @@ const EditHouse = () => {
     <div className="edit-house-container container grid bg-white rounded-[30px]">
       <div className='logo-container'>
         <div className="app-logo">
-          <Link to="/">
+          <Link to="/dashboard">
             <img src={appLogo} className="logo" alt="Chorepad Logo" />
           </Link>
         </div>

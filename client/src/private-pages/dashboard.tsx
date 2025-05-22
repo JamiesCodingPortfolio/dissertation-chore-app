@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import './dashboard.css'
@@ -6,11 +6,11 @@ import './dashboard.css'
 interface Chore {
   name: string;
   description: string;
+  houseName: string;
 }
 
 interface House {
   name: string;
-  maxMembers: number;
 }
 
 const Dashboard = () => {
@@ -20,60 +20,68 @@ const Dashboard = () => {
   const [description, setDescription] = useState('');
   const [chores, setChores] = useState<Chore[]>([]);
   const [refreshCounter, setRefreshCounter] = useState(0);
+  const lastUpdateTime = useRef<number>(Date.now());
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const verifySession = async () => {
-      try {
-        console.log("Mounted");
-        const response = await fetch('/api/dashboard', {
-          method: 'GET',
-          credentials: 'include'
-        });
+  const fetchDashboardData = async () => {
+    try {
+      const response = await fetch('/api/dashboard', {
+        method: 'GET',
+        credentials: 'include'
+      });
 
-        if (response.status === 401) {
-          navigate('/');
-          return;
-        }
-        
-        const data = await response.json();
+      if (response.status === 401) {
+        navigate('/');
+        return;
+      }
+      
+      const data = await response.json();
 
-        console.log('Response from server:', data.message);
-
-        console.log(data)
-
-        if (Array.isArray(data.houses)) {
-          setHouses(data.houses);
-          // Check for empty houses HERE after state update
-          if (data.houses.length === 0) {
-            navigate('/new-house');
-          }
-        } else {
-          console.error('Invalid houses data:', data.houses);
-          setHouses([]);
+      if (Array.isArray(data.houses)) {
+        setHouses(data.houses);
+        if (data.houses.length === 0) {
           navigate('/new-house');
         }
-
-        // Fix chores state type
-        setChores(data.chores || []);
-
-        console.log("Houses", data.houses);
-        console.log("Chores", data.chores);
-
-      } catch (error) {
-        console.error('Session verification failed:', error);
+      } else {
+        console.error('Invalid houses data:', data.houses);
+        setHouses([]);
+        navigate('/new-house');
       }
-    };
 
-    verifySession();
-  }, [navigate, refreshCounter]);
+      setChores(data.chores || []);
+      lastUpdateTime.current = Date.now();
+
+    } catch (error) {
+      console.error('Session verification failed:', error);
+    }
+  };
+
+  // Initial fetch and polling setup
+  useEffect(() => {
+    fetchDashboardData();
+
+    // Set up polling interval
+    const pollingInterval = setInterval(() => {
+      const timeSinceLastUpdate = Date.now() - lastUpdateTime.current;
+      // Only fetch if it's been more than a minute since the last update
+      if (timeSinceLastUpdate >= 60000) {
+        fetchDashboardData();
+      }
+    }, 60000); // Check every minute
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(pollingInterval);
+  }, [navigate]);
+
+  // Effect for manual refresh counter
+  useEffect(() => {
+    fetchDashboardData();
+  }, [refreshCounter]);
 
   const handleChoreSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log({ choreName, selectedHouse, description});
-    try{
-
+    try {
       const response = await fetch('/api/new-chore', {
         method: 'POST',
         credentials: 'include',
@@ -93,12 +101,9 @@ const Dashboard = () => {
         throw new Error(data.message || 'Chore Failed');
       }
 
-      console.log(data.message);
-
       setChoreName('');
       setDescription('');
       setSelectedHouse('');
-
       setRefreshCounter(prev => prev + 1);
 
     } catch (error) {
@@ -107,24 +112,47 @@ const Dashboard = () => {
   };
 
   const handleLogout = async () => {
-  try {
-    const response = await fetch('/api/logout', {
-      method: 'POST',
-      credentials: 'include'
-    });
+    try {
+      const response = await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Chore Failed');
-    }
+      if (!response.ok) {
+        throw new Error(data.message || 'Chore Failed');
+      }
 
-    navigate('/');
+      navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
-    
+
+  const handleChoreComplete = async (choreName: string, houseName: string) => {
+    try {
+      const response = await fetch(`/api/chores/${encodeURIComponent(choreName)}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ houseName })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to complete chore');
+      }
+
+      setRefreshCounter(prev => prev + 1);
+    } catch (error) {
+      console.error('Error completing chore:', error);
+    }
+  };
+
   return (
     <>
       <div className='dashboard-body'>
@@ -152,16 +180,20 @@ const Dashboard = () => {
                   key={index}
                   className="chore-card bg-gray-50 rounded-lg p-4 mb-3"
                 >
-                  <div className="font-semibold text-lg text-[#E2848C]">
-                    <h1>
-                      Chore name: {chore.name}
-                    </h1>
+                  <div className="chore-content">
+                    <div className="font-semibold text-lg text-[#E2848C]">
+                      <h1>Chore name: {chore.name}</h1>
+                    </div>
+                    <div className="text-gray-600 mt-1">
+                      <h1>Description: {chore.description}</h1>
+                    </div>
                   </div>
-                  <div className="text-gray-600 mt-1">
-                    <h1>
-                      Description: {chore.description}
-                    </h1>
-                  </div>
+                  <button
+                    onClick={() => handleChoreComplete(chore.name, chore.houseName)}
+                    className="done-button bg-[#4CAF50] text-white rounded-lg p-2 hover:bg-[#45a049] transition-colors cursor-pointer shadow-md hover:shadow-lg active:scale-95"
+                  >
+                    Done
+                  </button>
                 </div>
               ))
             )}
@@ -175,13 +207,12 @@ const Dashboard = () => {
               <h1 className='text-center'>
                 New Chore
               </h1>
-              <div className='absolute right-8 top bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b] transition-colors cursor-pointer shadow-md hover:shadow-lg active:scale-95'>
-                <button onClick={handleLogout}>
-                  <span>
-                    <h2>Logout</h2>
-                  </span>
-                </button>
-              </div>
+              <button 
+                onClick={handleLogout}
+                className='absolute right-8 top bg-[#E2848C] text-white rounded-lg p-3 hover:bg-[#d8737b] transition-colors cursor-pointer shadow-md hover:shadow-lg active:scale-95'
+              >
+                <h2>Logout</h2>
+              </button>
             </div>
             
             <div className='new-chore-container'>

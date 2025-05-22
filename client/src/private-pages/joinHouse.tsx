@@ -1,13 +1,31 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import appLogo from '../assets/App Logo.svg';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const JoinHouse = () => {
   const [houseName, setHouseName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
-  const [successMessage, setSuccessMessage] = useState<string>(''); 
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  const navigate = useNavigate();
+
+  // Add effect to handle redirect after success message
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    if (successMessage) {
+      timeoutId = setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [successMessage, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +80,7 @@ const JoinHouse = () => {
       
       <form onSubmit={handleSubmit} className="flex flex-col gap-10 justify-between h-2/5">
         <div className="dashboard-title-text text-center">
-          <h1>Join House</h1>
+          <h1 className="text-2xl">Join House</h1>
         </div>
         
         <div className="space-y-4">
